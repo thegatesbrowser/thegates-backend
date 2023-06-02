@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gates</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- подключаем Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- стили для шапки -->
+    <style>
+        header.header {
+            background-color: #0e6eb8;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        header.header h1 {
+            margin: 0;
+        }
+    </style>
+    <style>
+        /* Стили для шапки */
+        .header {
+            background-color: #0077FF;
+            color: #FFFFFF;
+            padding: 10px;
+        }
+
+        .header a {
+            color: #FFFFFF;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Стили для sidebar */
+        .sidebar {
+
+            width: 200px;
+            background-color: #0077FF;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .sidebar a {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Стили для основной части */
+        .main {
+            padding: 20px;
+            margin-left: 200px;
+        }
+
+        /* Стили для footer */
+        .footer {
+            background-color: #333333;
+            color: #FFFFFF;
+            padding: 3px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка сайта -->
+    <header class="header">
+        <div class="container">
+            <h1>Gates</h1>
+        </div>
+    </header>
+
+    <!-- Основная часть сайта -->
+    <main class="main">
+        <div class="container">
+            <div class="row">
+                <!-- Боковая панель (sidebar) -->
+                <aside class="col-md-3 sidebar">
+                    <ul class="list-group ">
+                        <a href="{% url 'stats' %}" class="list-group-item">Аналитика для игр</a>
+                        <a href="{% url 'stats_no_games' %}" class="list-group-item">Аналитика для не игр</a>
+                        <a href="{% url 'contacts' %}" class="list-group-item">Контакты</a>
+                        <a href="{% url 'home' %}" class="list-group-item">Все игры</a>
+                        <a href="{% url 'admin:index' %}" class="list-group-item">Админка</a>
+                    </ul>
+                </aside>
+
+                    <!-- Основное содержимое -->
+        <div class="col-md-9">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+</main>
+<!-- Футер сайта -->
+<footer class="footer">
+    <div class="container">
+        <p>© Gates 2023. All Rights Reserved.</p>
+    </div>
+</footer>
+<!-- подключаем JavaScript для Bootstrap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

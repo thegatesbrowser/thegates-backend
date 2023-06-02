@@ -1,0 +1,43 @@
+from django.db import models
+from django.utils import timezone
+
+
+class Downloads(models.Model):
+    date = models.DateTimeField(default=timezone.now)
+    gate_app = models.CharField(max_length=50)
+    # данные пользователя
+    ip_address = models.CharField(max_length=50,null=True,blank=True)
+    user_agent = models.TextField(null=True,blank=True)
+    #От контента вплоть до города
+    continent = models.CharField(max_length=50, null=True, blank=True)
+    continentCode = models.CharField(max_length=50, null=True, blank=True)
+    country = models.CharField(max_length=50, null=True,blank=True)
+    countryCode = models.CharField(max_length=50, null=True,blank=True)
+    region = models.CharField(max_length=50, null=True,blank=True)
+    regionName = models.CharField(max_length=50, null=True,blank=True)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    # Координаты
+    lat = models.FloatField(null=True,blank=True)
+    lon= models.FloatField(null=True,blank=True)
+    # Временная зона
+    timezone = models.CharField(max_length=50, null=True,blank=True)
+    # Информация про организацию
+    isp = models.TextField(null=True,blank=True)
+    as_info = models.TextField(null=True,blank=True)
+    asname = models.TextField(null=True,blank=True)
+    reverse = models.TextField(null=True,blank=True)
+    org = models.TextField(null=True,blank=True)
+    # Является ли мобильной связью, прокси сервером или хостинговым сервером
+    mobile = models.BooleanField(null=True,blank=True)
+    proxy= models.BooleanField(null=True,blank=True)
+    hosting= models.BooleanField(null=True,blank=True)
+    #В случае ошибки
+    error_msg = models.TextField(null=True,blank=True)
+    # Является ли игрой
+    if_game = models.BooleanField(null=True, blank=True)
+
+
+
+
+
+

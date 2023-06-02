@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+<style>
+  .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.box {
+  border: 2px solid #ccc;
+  padding: 20px;
+  text-align: center;
+}
+</style>
+{% block content %}
+  <div class="container">
+  <div class="box">
+    <h2>Login</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Login</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

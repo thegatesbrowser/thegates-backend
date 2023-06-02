@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+<head>
+<title>Аналитика</title>
+</head>
+<body>
+{% block content %}
+<h1><b>Информация по играм от {{ start_date }} до {{ end_date }} </b></h1>
+<form method="post">
+    {% csrf_token %}
+    <div class="container">
+        <h1>Выберите промежуток дат</h1>
+        <label for="start_date">Начальная дата:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+        <label for="end_date">Конечная дата:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+        <button type="submit">Применить</button>
+    </div>
+</form>
+<div class="container">
+    <h1>Скачивания всех игр по дням</h1>
+    {{ plot_all_games_time|safe }}
+  </div>
+<div class="container">
+    <h1>Скачивания каждой игры по дням</h1>
+    {{ plot_time|safe }}
+  </div>
+<div class="container">
+    <h1>Круговая диаграмма распределения скачиваний</h1>
+    {{ plot_pie|safe }}
+  </div>
+<div class="container">
+    <h1>Столбчатая диаграмма по странам для игр</h1>
+    {{ games_by_country|safe }}
+  </div>
+<div class="container">
+    <h1>Столбчатая диаграмма по регионам ддля игр</h1>
+    {{ games_by_regionName|safe }}
+  </div>
+<div class="container">
+    <h1>Столбчатая диаграмма по городам для игр</h1>
+    {{ games_by_city|safe }}
+  </div>
+
+{% endblock %}
+
+

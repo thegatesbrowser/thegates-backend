@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+    {% block content %}
+    <div class="container">
+    <h1>Игры в Gates</h1>
+    <p>Здесь перечислены все игры, доступные в игре Gates:</p>
+    <ul>
+{% for s in all_games %}
+  <li>{{ s }}</li>
+{% endfor %}
+</ul>
+    </div>
+    {% endblock %}

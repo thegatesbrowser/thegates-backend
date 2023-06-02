@@ -1,0 +1,5 @@
+staticfiles/*
+*__pycache__/
+
+nohup.out
+*.sqlite3
