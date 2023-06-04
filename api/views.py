@@ -11,5 +11,5 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
 def get_user_id(req: http.HttpRequest) -> http.HttpResponse:
     if req.method == 'GET':
         device_id = req.GET.get('device_id', '')
-        if device_id != '': return http.HttpResponse(content='default')
+        if device_id != '': return http.HttpResponse(content=device_id) # TODO: combine with IP address
     return http.HttpResponse(status=400)
