@@ -1,4 +1,5 @@
 from django.views.static import serve
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import Downloads
 from plotly.offline import plot
@@ -11,12 +12,16 @@ from django.db.models import Count, Q
 from myapp.apps import all_games
 import requests
 import datetime
+
+
 def kostyl():
     all_links = Downloads.objects.all()
     for link in all_links:
         link.if_game = check_if_game(link.gate_app)
         link.save()
     return 1
+
+
 def check_if_game(link):
     # Определить тип ссылки
     if_game = None
@@ -27,6 +32,8 @@ def check_if_game(link):
     else:
         if_game = False
     return if_game
+
+
 def games_group_by_regionName(start_date, end_date,if_game=True):
     data = Downloads.objects.filter(Q(date__gte=start_date) & Q(date__lt=end_date),if_game=if_game).values('regionName').annotate(count=Count('id'))
     x_values = [d['regionName'] for d in data]
@@ -54,6 +61,7 @@ def games_group_by_regionName(start_date, end_date,if_game=True):
     plot_div = pyo.plot(fig, auto_open=False, output_type='div')
     return plot_div
 
+
 def games_group_by_city(start_date, end_date,if_game=True):
     data = Downloads.objects.filter(Q(date__gte=start_date) & Q(date__lt=end_date),if_game=if_game).values('city').annotate(count=Count('id'))
     x_values = [d['city'] for d in data]
@@ -80,6 +88,8 @@ def games_group_by_city(start_date, end_date,if_game=True):
     fig = go.Figure(data=[trace], layout=layout)
     plot_div = pyo.plot(fig, auto_open=False, output_type='div')
     return plot_div
+
+
 def games_group_by_country(start_date, end_date,if_game=True):
     data = Downloads.objects.filter(Q(date__gte=start_date) & Q(date__lt=end_date),if_game=if_game).values('country').annotate(count=Count('id'))
     x_values = [d['country'] for d in data]
@@ -106,6 +116,8 @@ def games_group_by_country(start_date, end_date,if_game=True):
     fig = go.Figure(data=[trace], layout=layout)
     plot_div = pyo.plot(fig, auto_open=False, output_type='div')
     return plot_div
+
+
 def circle_plot_by_games(start_date, end_date,if_game = True):
     # Получаем данные по скачиваниям каждой игры
     downloads_by_game = Downloads.objects.filter(Q(date__gte=start_date) & Q(date__lt=end_date),if_game=if_game).values('gate_app').annotate(count=Count('id')).order_by(
@@ -127,6 +139,7 @@ def circle_plot_by_games(start_date, end_date,if_game = True):
     # Генерируем HTML-код для диаграммы
     plot_pie = plot(fig, output_type='div')
     return plot_pie
+
 
 def plot_time_all_game(start_date, end_date,if_game = True):
     # 1 график
@@ -184,6 +197,7 @@ def plot_time_all_game(start_date, end_date,if_game = True):
     plot_all_games_time = pyo.plot(fig, auto_open=False, output_type='div')
     return plot_all_games_time
 
+
 def plot_time_each_game(start_date, end_date,if_game = True):
     # 2 график
     # Создать временной ряд для каждого `gate_app`
@@ -239,6 +253,8 @@ def plot_time_each_game(start_date, end_date,if_game = True):
     fig = go.Figure(data=data, layout=layout)
     plot_time = pyo.plot(fig, auto_open=False, output_type='div')
     return plot_time
+
+
 def data_save(location_info, user_agent,request,if_game = True):
     if location_info['status'] == 'success':
         continent = location_info['continent']
@@ -274,12 +290,15 @@ def data_save(location_info, user_agent,request,if_game = True):
         download.save()
     return 1
 
+
 def get_location_info(ip_address):
     url = f"http://ip-api.com/json/{ip_address}?fields=66846719"
     response = requests.get(url)
     data = response.json()
     return data
 
+
+@csrf_exempt
 def every(request):
     ip_address = request.META['REMOTE_ADDR']
     user_agent = request.META['HTTP_USER_AGENT']
@@ -299,12 +318,14 @@ def home(request):
     }
     return render(request, 'home.html',context)
 
+
 def contacts(request):
     ip_address = request.META['REMOTE_ADDR']
     user_agent = request.META['HTTP_USER_AGENT']
     location_info = get_location_info(ip_address)
     data_save(location_info, user_agent, request, if_game=False)
     return render(request, 'contacts.html')
+
 
 def stats(request):
     # чтобы игры стали играми, а не игры стали не играми(на всякий случай)
@@ -345,6 +366,8 @@ def stats(request):
         'start_date': start_date,
         'end_date': end_date - datetime.timedelta(days=1),
     })
+
+
 def stats_no_games(request):
     # чтобы игры стали играми, а не игры стали не играми(на всякий случай)
     kostyl()
