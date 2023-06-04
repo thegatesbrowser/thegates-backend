@@ -1,5 +1,4 @@
 from django.views.static import serve
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import Downloads
 from plotly.offline import plot
@@ -298,7 +297,6 @@ def get_location_info(ip_address):
     return data
 
 
-@csrf_exempt
 def every(request):
     ip_address = request.META['REMOTE_ADDR']
     user_agent = request.META['HTTP_USER_AGENT']
