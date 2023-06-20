@@ -13,12 +13,7 @@ import requests
 import datetime
 
 
-def kostyl():
-    all_links = Downloads.objects.all()
-    for link in all_links:
-        link.if_game = check_if_game(link.gate_app)
-        link.save()
-    return 1
+
 
 
 def check_if_game(link):
@@ -327,7 +322,6 @@ def contacts(request):
 
 def stats(request):
     # чтобы игры стали играми, а не игры стали не играми(на всякий случай)
-    kostyl()
     ip_address = request.META['REMOTE_ADDR']
     user_agent = request.META['HTTP_USER_AGENT']
     location_info = get_location_info(ip_address)
@@ -368,7 +362,6 @@ def stats(request):
 
 def stats_no_games(request):
     # чтобы игры стали играми, а не игры стали не играми(на всякий случай)
-    kostyl()
     ip_address = request.META['REMOTE_ADDR']
     user_agent = request.META['HTTP_USER_AGENT']
     location_info = get_location_info(ip_address)
