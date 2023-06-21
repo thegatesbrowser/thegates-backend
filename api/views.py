@@ -3,6 +3,8 @@ from django import http
 from myapp.views import get_location_info
 from myapp.models import Events
 import json
+
+
 def data_save(location_info, user_agent,json_data):
     
     event_name= json_data['event_name']
@@ -44,6 +46,7 @@ def data_save(location_info, user_agent,json_data):
         event.save()
     return 1
 
+
 @csrf_exempt
 def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     ip_address = req.META['REMOTE_ADDR']
@@ -54,6 +57,7 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
         
     data_save(location_info,user_agent,json_data)
     return http.HttpResponse(status=200)
+
 
 @csrf_exempt
 def get_user_id(req: http.HttpRequest) -> http.HttpResponse:
