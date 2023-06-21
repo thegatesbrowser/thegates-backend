@@ -72,6 +72,12 @@ class Events(models.Model):
     #В случае ошибки
     error_msg = models.TextField(null=True,blank=True)
 
+class Gates(models.Model):
+    url = models.TextField(null=True,blank=True)
+    title = models.TextField(null=True,blank=True)
+    description = models.TextField(null=True,blank=True)
+    image = models.TextField(null=True,blank=True)
+    resource_pack = models.TextField(null=True, blank=True)
 
 
 
