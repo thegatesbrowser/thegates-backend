@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django import http
+import requests
 import json
 from myapp.models import Gates
 from django.db.models import Q
@@ -63,6 +64,7 @@ def get_search_result(query: str) -> str:
 def search(req: http.HttpRequest) -> http.HttpResponse:
     if req.method == 'GET':
         query = req.GET.get('query', '')
+        query = requests.utils.unquote(query)
         if query != '': return http.HttpResponse(content=get_search_result(query))
     
     return http.HttpResponse(status=400)
