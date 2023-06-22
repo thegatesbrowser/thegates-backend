@@ -1,5 +1,7 @@
 staticfiles/*
+project_env/*
 *__pycache__/
 
 nohup.out
 *.sqlite3
+*mixpanel.key

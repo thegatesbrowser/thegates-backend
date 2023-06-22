@@ -3,6 +3,7 @@ from django import http
 from myapp.views import get_location_info
 from myapp.models import Events
 import json
+from . import mixpanel
 
 
 def data_save(location_info, user_agent,json_data):
@@ -54,8 +55,9 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     location_info = get_location_info(ip_address)
     
     json_data = json.loads(req.body)
-        
     data_save(location_info,user_agent,json_data)
+    
+    mixpanel.track(json_data)
     return http.HttpResponse(status=200)
 
 
