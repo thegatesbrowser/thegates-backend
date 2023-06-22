@@ -8,11 +8,11 @@ import json
 @csrf_exempt
 def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     parsed = user_agent_parser.Parse(req.headers["User-Agent"])
+    
     data = json.loads(req.body)
-
-    data["$os"]        = parsed["os"]["family"]
-    data['ip']         = req.META['REMOTE_ADDR']
-
+    data["$os"] = parsed["os"]["family"]
+    data['ip'] = req.META['REMOTE_ADDR']
+    
     mixpanel.track(data)
     return http.HttpResponse(status=200)
 
@@ -21,5 +21,8 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
 def get_user_id(req: http.HttpRequest) -> http.HttpResponse:
     if req.method == 'GET':
         device_id = req.GET.get('device_id', '')
-        if device_id != '': return http.HttpResponse(content=device_id) # TODO: combine with IP address
+        device_id = device_id.replace('{','')
+        device_id = device_id.replace('}','')
+        
+        if device_id != '': return http.HttpResponse(content=device_id)
     return http.HttpResponse(status=400)
