@@ -5,6 +5,12 @@ import json
 from myapp.models import Gates
 
 
+def is_local(url: str) -> bool:
+    return "://localhost" in url \
+        or "://127.0.0.1" in url \
+        or "://0.0.0.0" in url
+
+
 @csrf_exempt
 def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
     data = json.loads(req.body)
@@ -16,6 +22,9 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
     image = data['image']
     resource_pack = data['resource_pack']
     # libraries = data['libraries']
+
+    if is_local(url):
+        return http.HttpResponse(status=200)
     
     gates = Gates.objects.filter(url=url)
     if gates.count() < 1:
