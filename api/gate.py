@@ -27,7 +27,7 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
         return http.HttpResponse(status=200)
     
     gates = Gates.objects.filter(url=url)
-    if gates.count() < 1:
+    if gates.count() == 0:
         gate = Gates(url=url, title=title, description=description, image=image, resource_pack=resource_pack) #, libraries=libraries
         gate.save()
         print("Discovered gate: " + url)

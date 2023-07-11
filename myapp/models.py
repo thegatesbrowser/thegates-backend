@@ -36,6 +36,7 @@ class Downloads(models.Model):
     # Является ли игрой
     if_game = models.BooleanField(null=True, blank=True)
 
+
 class Events(models.Model):
     
     user_id = models.CharField(max_length=100)
@@ -72,6 +73,7 @@ class Events(models.Model):
     #В случае ошибки
     error_msg = models.TextField(null=True,blank=True)
 
+
 class Gates(models.Model):
     url = models.TextField(null=True,blank=True)
     title = models.TextField(null=True,blank=True)
@@ -79,3 +81,11 @@ class Gates(models.Model):
     image = models.TextField(null=True,blank=True)
     resource_pack = models.TextField(null=True, blank=True)
     # libraries = models.ArrayField(null=True,blank=True)
+
+
+class Users(models.Model):
+    name = models.TextField(null=True,blank=True)
+    email = models.TextField(null=True,blank=True)
+    user_id = models.TextField(null=True,blank=True)
+    country = models.TextField(null=True,blank=True)
+    city = models.TextField(null=True,blank=True)
