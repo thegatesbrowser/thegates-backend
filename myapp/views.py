@@ -1,6 +1,6 @@
 from django.views.static import serve
 from django.conf import settings
-from .models import Downloads
+from .models import Downloads, Gates
 from plotly.offline import plot
 import plotly.graph_objs as go
 import plotly.offline as pyo
@@ -398,3 +398,59 @@ def stats_no_games(request):
         'end_date': end_date - datetime.timedelta(days=1),
     })
 
+def create_index():
+    from meilisearch.client import Client
+    import sqlite3
+    meili_client = Client('http://127.0.0.1:7700', 'T7k0CsSOeo2vjJBl1kvym0pWlb2-G-S-RbM7kqdkErs')
+    
+    connection = sqlite3.connect('db.sqlite3')
+    cursor = connection.cursor()    
+
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+    for table in tables:
+        print(table[0]) 
+
+    cursor.execute("SELECT id, title, description, url, image, resource_pack, tags FROM myapp_gates;")
+    rows = cursor.fetchall()
+    
+    index = meili_client.index('gates')
+
+    counter = 0
+    for row in rows:
+        doc = {
+            'id': row[0],
+            'title': row[1],
+            'description': row[2],
+            'url': row[3],
+            'image': row[4],
+            'resource_pack': row[5],
+            'tags': row[6]
+        }
+        print(f'{row[0]}\n{row[1]}\n{row[2]}\n{row[6]}')
+        print('###############################################')
+        
+        
+        index.add_documents(doc)
+    
+    
+    synonyms = {
+    'game': ['play'],
+    'play': ['game'],
+    }
+    index.update_synonyms(synonyms)
+    index.update_settings({
+    'filterableAttributes': [
+      'title',
+      'description'
+    ],
+    'sortableAttributes': [
+        'title',
+        'description'
+    ],
+    'searchableAttributes': [
+        'title',
+        'description',
+        'tags'
+    ]
+    })
