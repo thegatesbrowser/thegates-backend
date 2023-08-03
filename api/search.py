@@ -7,14 +7,9 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
 from django.db.models import Count
-# from elasticsearch import Elasticsearch
-from meilisearch.client import Client
-import sqlite3
+from myapp.auth_meilisearch import index
+from myapp.auth_meilisearch import client as meili_client
 
-
-key = open('meilisearch/meilisearch.key', 'r').read()
-meili_client = Client('http://127.0.0.1:7700', key)
-index = meili_client.index('gates')
 
 
 class SearchResult:

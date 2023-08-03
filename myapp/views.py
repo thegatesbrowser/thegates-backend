@@ -399,10 +399,8 @@ def stats_no_games(request):
     })
 
 def create_index():
-    from meilisearch.client import Client
     import sqlite3
-    meili_client = Client('http://127.0.0.1:7700', 'T7k0CsSOeo2vjJBl1kvym0pWlb2-G-S-RbM7kqdkErs')
-    
+    from myapp.auth_meilisearch import client as meili_client
     connection = sqlite3.connect('db.sqlite3')
     cursor = connection.cursor()    
 
