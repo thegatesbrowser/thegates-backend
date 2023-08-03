@@ -10,8 +10,13 @@ from django.db.models import Count
 # from elasticsearch import Elasticsearch
 from meilisearch.client import Client
 import sqlite3
-meili_client = Client('http://127.0.0.1:7700', 'T7k0CsSOeo2vjJBl1kvym0pWlb2-G-S-RbM7kqdkErs')
+
+
+key = open('meilisearch.key', 'r').read()
+meili_client = Client('http://127.0.0.1:7700', key)
 index = meili_client.index('gates')
+
+
 class SearchResult:
     url: str
     title: str
@@ -23,6 +28,7 @@ class SearchResult:
         self.title = title
         self.description = description
         self.image = image
+
 
 # DJANGO ORM
 def get_search_result(query: str) -> str:
@@ -54,6 +60,7 @@ def get_search_result(query: str) -> str:
          results.append(gate)
 
     return json.dumps(results, default=vars)
+
 
 def search_in_meilisearch(query):
     
@@ -98,6 +105,7 @@ def extract_words_from_json(json_data, user_input, unique_words):
                         return {'prompt': word}  
 
     return {}
+
 
 def get_search_result_by_MS(query: str) -> str:
     print(query)
@@ -183,6 +191,7 @@ def search(req: http.HttpRequest) -> http.HttpResponse:
         # if query != '': return http.HttpResponse(content=get_search_result(query))        #   DJANGO ORM
         if query != '': return http.HttpResponse(content=get_search_result_by_MS(query))    
     return http.HttpResponse(status=400)
+
 
 @csrf_exempt
 def prompt(req: http.HttpRequest) -> http.HttpResponse:
