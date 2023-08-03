@@ -3,8 +3,11 @@ from django.dispatch import receiver
 import meilisearch
 from .models import Gates
 
+
 # Подключение к MeiliSearch
-client = meilisearch.Client('http://127.0.0.1:7700', 'T7k0CsSOeo2vjJBl1kvym0pWlb2-G-S-RbM7kqdkErs')  # Замените на актуальный хост и ключ
+key = open('meilisearch/meilisearch.key', 'r').read()
+client = meilisearch.Client('http://127.0.0.1:7700', key)
+
 
 # Функция для обновления данных в MeiliSearch
 def update_meilisearch_data(instance):

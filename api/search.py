@@ -12,7 +12,7 @@ from meilisearch.client import Client
 import sqlite3
 
 
-key = open('meilisearch.key', 'r').read()
+key = open('meilisearch/meilisearch.key', 'r').read()
 meili_client = Client('http://127.0.0.1:7700', key)
 index = meili_client.index('gates')
 
