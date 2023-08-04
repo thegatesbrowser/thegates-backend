@@ -73,7 +73,7 @@ def remove_duplicate_hits_by_id(hits):
 
 def extract_words_from_json(json_data, user_input, unique_words):
     user_input = user_input.lower()
-    for attr in ['title', 'description', 'tags']:
+    for attr in ['title', 'description']:
         if attr in json_data:
             if attr in json_data['_matchesPosition']:
                 
@@ -146,8 +146,7 @@ def get_search_result_by_MS(query: str) -> str:
                     'title': gate_obj.title,
                     'description': gate_obj.description,
                     'image': gate_obj.image,
-                    'resource_pack': gate_obj.resource_pack,
-                    'tags': gate_obj.tags
+                    'resource_pack': gate_obj.resource_pack
                 })
 
         
@@ -160,7 +159,7 @@ def get_prompt_words(query: str) -> str:
     user_input = query
     search_result = index.search(user_input, {
         'showMatchesPosition': True,
-        'attributesToSearchOn': ["title","description","tags"]
+        'attributesToSearchOn': ["title","description"]
     })
     unique_words = set()
   

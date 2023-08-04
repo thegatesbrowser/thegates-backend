@@ -422,10 +422,9 @@ def create_index():
             'description': row[2],
             'url': row[3],
             'image': row[4],
-            'resource_pack': row[5],
-            'tags': row[6]
+            'resource_pack': row[5]
         }
-        print(f'{row[0]}\n{row[1]}\n{row[2]}\n{row[6]}')
+        print(f'{row[0]}\n{row[1]}\n{row[2]}')
         print('###############################################')
         
         
@@ -448,7 +447,6 @@ def create_index():
     ],
     'searchableAttributes': [
         'title',
-        'description',
-        'tags'
+        'description'
     ]
     })
