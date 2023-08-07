@@ -80,7 +80,6 @@ class Gates(models.Model):
     description = models.TextField(null=True,blank=True)
     image = models.TextField(null=True,blank=True)
     resource_pack = models.TextField(null=True, blank=True)
-    tags = models.TextField(null=True, blank=True)
     number_of_entries = models.IntegerField(null=True, blank=True)
     # libraries = models.ArrayField(null=True,blank=True)
 

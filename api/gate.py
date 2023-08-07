@@ -45,29 +45,21 @@ def is_local(url: str) -> bool:
 @csrf_exempt
 def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
     data = json.loads(req.body)
-    print(data)
 
-    url = data['url']   # url = "http://95.163.241.188:8000/solar_system.gate"
+    url = data['url']
     title = data['title']
     description = data['description']
     image = data['image']
     resource_pack = data['resource_pack']
     # libraries = data['libraries']
-    tags = ''
-    words = extract_words_from_url(url)
-    if words:
-        print(", ".join(words))
-        tags = ", ".join(words)
-    else:
-        print("No meaningful words found in the URL.")
 
     if is_local(url):
         return http.HttpResponse(status=200)
     
     gates = Gates.objects.filter(url=url)
     if gates.count() == 0:
-        gate = Gates(url=url, title=title, description=description, image=image, resource_pack=resource_pack,tags = tags) #, libraries=libraries
-        gate.number_of_entries = gate.number_of_entries + 1
+        gate = Gates(url=url, title=title, description=description, image=image,
+                     resource_pack=resource_pack, number_of_entries=1) #, libraries=libraries
         gate.save()
         print("Discovered gate: " + url)
     else:
@@ -77,6 +69,10 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
         gate.description = description
         gate.image = image
         gate.resource_pack = resource_pack
-        gate.number_of_entries = gate.number_of_entries + 1
+        
+        if gate.number_of_entries is None: gate.number_of_entries = 1
+        else: gate.number_of_entries += 1
+        
+        gate.save()
     
     return http.HttpResponse(status=200)

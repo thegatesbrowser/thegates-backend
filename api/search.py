@@ -118,20 +118,17 @@ def get_search_result_by_MS(query: str) -> str:
     
     # all_hits_json = json.dumps(all_hits, ensure_ascii=False, indent=4)  
     output_json = json.dumps(all_hits, indent=2)
-    print(type(output_json))
     if output_json == '[]':
         print("JSON пустой")
         top_count = 5
         end_date = timezone.now()
         start_date = end_date - timedelta(days=30)
-
         
         top_downloads = Downloads.objects.filter(if_game=True, date__range=[start_date, end_date]) \
                             .values('gate_app') \
                             .annotate(download_count=Count('gate_app')) \
                             .order_by('-download_count')[:top_count]
-
-       
+        
         for item in top_downloads:
             print(f"Gate App: {item['gate_app']}, Download Count: {item['download_count']}")
         result_list = []
@@ -148,10 +145,9 @@ def get_search_result_by_MS(query: str) -> str:
                     'image': gate_obj.image,
                     'resource_pack': gate_obj.resource_pack
                 })
-
         
         output_json = json.dumps(result_list, indent=2)
-        print(output_json)
+    
     return output_json
 
 
