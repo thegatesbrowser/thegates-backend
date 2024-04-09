@@ -1,2 +1,2 @@
-chmod +x meilisearch-linux-amd64
-nohup ./meilisearch-linux-amd64 --master-key "$(< meilisearch.key)" &
+chmod +x meilisearch
+nohup ./meilisearch --master-key "$(< meilisearch.key)" &
