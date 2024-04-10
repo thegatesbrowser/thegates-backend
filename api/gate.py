@@ -84,11 +84,12 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
 @csrf_exempt
 def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
     if req.method != 'GET': return http.HttpResponse(status=400)
-    print("Featured gates")
+    print("Featured gates:")
     
-    fgates_objs = FeaturedGates.objects
-    for gate_obj in fgates_objs:
-        print(f"Gate: {gate_obj['title']}, Url: {gate_obj['url']}")
+    fgates_objs = FeaturedGates.objects.all()
+
+    titles = [item['title'] for item in fgates_objs.values()]
+    print(titles)
     
     result_list = []
     for gate_obj in fgates_objs:
