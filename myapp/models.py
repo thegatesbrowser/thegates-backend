@@ -84,6 +84,13 @@ class Gates(models.Model):
     # libraries = models.ArrayField(null=True,blank=True)
 
 
+class FeaturedGates(models.Model):
+    url = models.TextField(null=True,blank=True)
+    title = models.TextField(null=True,blank=True)
+    description = models.TextField(null=True,blank=True)
+    image = models.TextField(null=True,blank=True)
+
+
 class Users(models.Model):
     name = models.TextField(null=True,blank=True)
     email = models.TextField(null=True,blank=True)

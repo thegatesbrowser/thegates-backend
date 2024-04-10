@@ -172,7 +172,6 @@ def get_prompt_words(query: str) -> str:
     return output_json
 
 
-
 @csrf_exempt
 def search(req: http.HttpRequest) -> http.HttpResponse:
     if req.method == 'GET':

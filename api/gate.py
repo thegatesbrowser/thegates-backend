@@ -2,9 +2,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django import http
 import requests
 import json
-from myapp.models import Gates
+from myapp.models import Gates, FeaturedGates
 from urllib.parse import urlparse
 import re
+
 
 def is_valid_hostname(hostname):
     # Проверяем, является ли `hostname` IP-адресом
@@ -12,6 +13,7 @@ def is_valid_hostname(hostname):
     if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname):
         return False
     return True
+
 
 def extract_words_from_url(url):
     # Разбираем URL на его компоненты
@@ -34,6 +36,7 @@ def extract_words_from_url(url):
     # Удаляем заданные слова "http", "https" и "gate", если они присутствуют
     words = [word for word in words if word.lower() not in ['http', 'https', 'gate', 'me', 'com']]
     return words
+
 
 def is_local(url: str) -> bool:
     # return ''
@@ -76,3 +79,25 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
         gate.save()
     
     return http.HttpResponse(status=200)
+
+
+@csrf_exempt
+def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
+    if req.method != 'GET': return http.HttpResponse(status=400)
+    print("Featured gates")
+    
+    fgates_objs = FeaturedGates.objects
+    for gate_obj in fgates_objs:
+        print(f"Gate: {gate_obj['title']}, Url: {gate_obj['url']}")
+    
+    result_list = []
+    for gate_obj in fgates_objs:
+        result_list.append({
+            'url': gate_obj.url,
+            'title': gate_obj.title,
+            'description': gate_obj.description,
+            'image': gate_obj.image,
+        })
+    
+    output_json = json.dumps(result_list, indent=2)
+    return http.HttpResponse(content=output_json)

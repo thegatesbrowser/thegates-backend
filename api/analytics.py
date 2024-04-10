@@ -20,17 +20,6 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     return http.HttpResponse(status=200)
 
 
-@csrf_exempt # DEPRECATED from TheGates 0.5.2
-def get_user_id(req: http.HttpRequest) -> http.HttpResponse:
-    if req.method == 'GET':
-        device_id = req.GET.get('device_id', '')
-        device_id = device_id.replace('{','')
-        device_id = device_id.replace('}','')
-        
-        if device_id != '': return http.HttpResponse(content=device_id)
-    return http.HttpResponse(status=400)
-
-
 @csrf_exempt
 def create_user_id(req: http.HttpRequest) -> http.HttpResponse:
     if req.method != 'GET':
