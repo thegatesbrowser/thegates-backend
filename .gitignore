@@ -1,5 +1,6 @@
 staticfiles/*
 project_env/*
+builds/*
 *__pycache__/
 
 nohup.out
