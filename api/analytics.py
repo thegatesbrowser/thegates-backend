@@ -14,7 +14,7 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     
     data = json.loads(req.body)
     data["$os"] = parsed["os"]["family"]
-    data['ip'] = req.META['REMOTE_ADDR']
+    data['ip'] = req.META['HTTP_X_REAL_IP']
     
     mixpanel.track(data)
     return http.HttpResponse(status=200)
