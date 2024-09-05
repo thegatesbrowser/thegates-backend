@@ -5,6 +5,7 @@ from django.db.models import Q
 import json
 import uuid
 from . import mixpanel
+from . import telegram
 from myapp.models import Users
 
 
@@ -17,6 +18,7 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     data['ip'] = req.META['HTTP_X_REAL_IP']
     
     mixpanel.track(data)
+    telegram.bot_notify_event(data)
     return http.HttpResponse(status=200)
 
 

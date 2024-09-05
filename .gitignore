@@ -5,4 +5,8 @@ builds/*
 
 nohup.out
 *.sqlite3
+
+# Keys
 *mixpanel.key
+*telegram_bot.key
+*my_telegram_id.key

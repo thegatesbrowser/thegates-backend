@@ -1,6 +1,6 @@
 from mixpanel import Mixpanel
 
-key = open('mixpanel.key', 'r').read()
+key = open('keys/mixpanel.key', 'r').read()
 mp = Mixpanel(key)
 
 
