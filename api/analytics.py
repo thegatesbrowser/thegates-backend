@@ -17,8 +17,8 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     data["$os"] = parsed["os"]["family"]
     data['ip'] = req.META['HTTP_X_REAL_IP']
     
-    mixpanel.track(data)
-    telegram.bot_notify_event(data)
+    mixpanel.track(data.copy())
+    telegram.bot_notify_event(data.copy())
     return http.HttpResponse(status=200)
 
 
