@@ -116,7 +116,12 @@ def get_search_result_by_MS(query: str) -> str:
         all_hits.extend(word_search_results)
     all_hits = remove_duplicate_hits_by_id(all_hits)
     
-    # all_hits_json = json.dumps(all_hits, ensure_ascii=False, indent=4)  
+    for hint in all_hits:
+        url = hint['url']
+        gate_objs = Gates.objects.filter(url__endswith=f"{url}")
+        for gate_obj in gate_objs:
+            hint['number_of_entries'] = gate_obj.number_of_entries
+    
     output_json = json.dumps(all_hits, indent=2)
     if output_json == '[]':
         print("JSON пустой")
