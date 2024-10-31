@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from . import analytics
 from . import search
 from . import gate
+from . import logs
 
 
 urlpatterns = [
@@ -10,5 +11,6 @@ urlpatterns = [
     path('api/discover_gate', gate.discover_gate),
     path('api/featured_gates', gate.featured_gates),
     path('api/search', search.search),
-    path('api/prompt', search.prompt)
+    path('api/prompt', search.prompt),
+    path('api/send_logs', logs.send_logs)
 ]
