@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/create_user_id', analytics.create_user_id),
     path('api/discover_gate', gate.discover_gate),
     path('api/featured_gates', gate.featured_gates),
+    path('api/all_gates', gate.all_gates),
     path('api/search', search.search),
     path('api/prompt', search.prompt),
     path('api/send_logs', logs.send_logs)

@@ -102,3 +102,28 @@ def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
     
     output_json = json.dumps(result_list, indent=2)
     return http.HttpResponse(content=output_json)
+
+
+@csrf_exempt
+def all_gates(req: http.HttpRequest) -> http.HttpResponse:
+    if req.method != 'GET': return http.HttpResponse(status=400)
+    print("All gates:")
+    
+    gates_objs = Gates.objects.all()
+
+    titles = [item['title'] for item in gates_objs.values()]
+    print(titles)
+    
+    result_list = []
+    for gate_obj in gates_objs:
+        result_list.append({
+            'id': str(gate_obj.pk),
+            'url': gate_obj.url,
+            'title': gate_obj.title,
+            'description': gate_obj.description,
+            'image': gate_obj.image,
+            'number_of_entries': gate_obj.number_of_entries
+        })
+    
+    output_json = json.dumps(result_list, indent=2)
+    return http.HttpResponse(content=output_json)

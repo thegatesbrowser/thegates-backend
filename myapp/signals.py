@@ -13,8 +13,8 @@ def update_meilisearch_data(instance):
         'title': instance.title,
         'description': instance.description,
         'image': instance.image,
-        'resource_pack': instance.resource_pack
-        # 'number_of_entries': instance.number_of_entries,
+        'resource_pack': instance.resource_pack,
+        'number_of_entries': instance.number_of_entries
     }
     index.update_documents([data])
 
