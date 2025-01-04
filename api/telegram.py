@@ -7,12 +7,11 @@ url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
 
 
 def get_location(ip_address: str):
-    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json()
+    response = requests.get(f"http://ip-api.com/json/{ip_address}?fields=66846719").json()
     location_data = {
         'ip': ip_address,
         'city': response.get('city'),
-        'region': response.get('region'),
-        'country': response.get('country_name')
+        'country': response.get('country')
     }
     return location_data
 
@@ -32,7 +31,7 @@ def bot_notify_event(data):
     
     params = {
         'chat_id': chat_id,
-        'text': f'User opened TheGates {user_id} {city} {country}'
+        'text': f'User opened TheGates {city} {country} {user_id}'
     }
 
     response = requests.get(url, params=params)
