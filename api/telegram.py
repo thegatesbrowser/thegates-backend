@@ -31,12 +31,12 @@ def bot_notify_event(data):
     
     params = {
         'chat_id': chat_id,
-        'text': f'User opened TheGates {city} {country} {user_id}'
+        'text': f'User opened TheGates {user_id}\n{city} {country}'
     }
 
     response = requests.get(url, params=params)
 
     if response.status_code == 200:
-        print('Message sent: ' + params['text'])
+        print('Message sent:\n' + params['text'])
     else:
         print('Failed to send message:', response.text)
