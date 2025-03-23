@@ -133,28 +133,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_CHARSET = 'utf-8'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
-# SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-# SESSION_COOKIE_SECURE = False
-# CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# # Настройки кэша
-# # ...
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': 'redis://127.0.0.1:6379',
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#         },
-#         'KEY_PREFIX': 'my_cache',
-#     },
-# }
-#
-#
-#
-# # Настройки Celery для использования кэша
-# CELERY_CACHE_BACKEND = 'default'

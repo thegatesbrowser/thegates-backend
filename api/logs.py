@@ -11,10 +11,10 @@ logs_folder = 'staticfiles/logs'
 def create_path(url: str) -> str:
     folder = url.replace('http://', '').replace('https://', '').replace('.gate', '')
     folder = folder.replace(':', '_') # remove ':' before port
-
+    
     date = timezone.datetime.now(datetime.timezone.utc)
     path = logs_folder + '/' + folder + '/log__' + date.strftime('%Y_%m_%d__%H_%M_%S') + '.txt'
-
+    
     return path
 
 

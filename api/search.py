@@ -183,7 +183,7 @@ def search(req: http.HttpRequest) -> http.HttpResponse:
         query = req.GET.get('query', '')
         query = requests.utils.unquote(query)
         # if query != '': return http.HttpResponse(content=get_search_result(query))        #   DJANGO ORM
-        if query != '': return http.HttpResponse(content=get_search_result_by_MS(query))    
+        if query != '': return http.HttpResponse(content=get_search_result_by_MS(query))
     return http.HttpResponse(status=400)
 
 
@@ -192,6 +192,6 @@ def prompt(req: http.HttpRequest) -> http.HttpResponse:
     if req.method == 'GET':
         query = req.GET.get('query', '')
         query = requests.utils.unquote(query)
-        if query != '': return http.HttpResponse(content=get_prompt_words(query))    
+        if query != '': return http.HttpResponse(content=get_prompt_words(query))
 
     return http.HttpResponse(status=400)
