@@ -12,14 +12,14 @@ def is_local(url: str) -> bool:
 
 @csrf_exempt
 def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
-    if is_local(url): return http.HttpResponse(status=200)
-    
     data = json.loads(req.body)
     url = data['url']
     title = data['title']
     description = data['description']
     image = data['image']
     resource_pack = data['resource_pack']
+    
+    if is_local(url): return http.HttpResponse(status=200)
     
     gates = Gates.objects.filter(url=url)
     if gates.count() == 0:

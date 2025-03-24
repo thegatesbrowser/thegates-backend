@@ -20,7 +20,7 @@ class SearchSuggestionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'query')
 
 class TelegramBotUserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'is_ignore')
+    list_display = ('id', 'user_id', 'description', 'is_ignore')
 
 admin.site.register(Downloads, DownloadsAdmin)
 admin.site.register(Events, EventsAdmin)
