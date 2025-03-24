@@ -1,16 +1,19 @@
-from django.views.decorators.csrf import csrf_exempt
-from ua_parser import user_agent_parser
-from django import http
-from django.db.models import Q
+import os
 import json
 import uuid
-from . import mixpanel
-from . import telegram
+from api.integrations import mixpanel
+from api.integrations import telegram
+from django import http
+from django.db.models import Q
 from myapp.models import Users
+from ua_parser import user_agent_parser
+from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt
 def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
+    if os.getenv('DISABLE_ANALYTICS'): return http.HttpResponse(status=200)
+    
     parsed = user_agent_parser.Parse(req.headers["User-Agent"])
     
     data = json.loads(req.body)

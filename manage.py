@@ -18,7 +18,7 @@ def check_django_installation():
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gates.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
     execute_command_line = check_django_installation()
     execute_command_line(sys.argv)
 
