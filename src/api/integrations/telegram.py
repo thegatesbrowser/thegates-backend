@@ -1,4 +1,5 @@
 import requests
+from myapp.models import TelegramBotUser
 
 bot_token = open('keys/telegram_bot.key', 'r').read()
 chat_id = open('keys/my_telegram_id.key', 'r').read()
@@ -19,9 +20,9 @@ def get_location(ip_address: str):
 def bot_notify_event(data):
     user_id = data.get('user_id')
     event_name = data.get('event_name')
-    user_ignore = open('staticfiles/telegram_bot_user_ignore.txt', 'r').read()
     
-    if event_name != 'application_open' or user_id in user_ignore:
+    telegram_bot_user = TelegramBotUser.objects.filter(user_id=user_id).first()
+    if event_name != 'application_open' or telegram_bot_user.is_ignore:
         return
     
     ip = data.get('ip')

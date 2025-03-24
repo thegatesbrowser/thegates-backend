@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Downloads, Events, Gates, FeaturedGates, Users, SearchSuggestions
+from .models import Downloads, Events, Gates, FeaturedGates, Users, SearchSuggestions, TelegramBotUser
 
 class DownloadsAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'gate_app')
@@ -19,9 +19,13 @@ class UsersAdmin(admin.ModelAdmin):
 class SearchSuggestionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'query')
 
+class TelegramBotUserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user_id', 'is_ignore')
+
 admin.site.register(Downloads, DownloadsAdmin)
 admin.site.register(Events, EventsAdmin)
 admin.site.register(Gates, GatesAdmin)
 admin.site.register(FeaturedGates, FeaturedGatesAdmin)
 admin.site.register(Users, UsersAdmin)
 admin.site.register(SearchSuggestions, SearchSuggestionsAdmin)
+admin.site.register(TelegramBotUser, TelegramBotUserAdmin)

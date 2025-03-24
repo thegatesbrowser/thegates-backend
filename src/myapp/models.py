@@ -101,3 +101,8 @@ class Users(models.Model):
 
 class SearchSuggestions(models.Model):
     query = models.TextField(null=True,blank=True)
+
+
+class TelegramBotUser(models.Model):
+    user_id = models.TextField(null=True,blank=True)
+    is_ignore = models.BooleanField(null=True,blank=True)
