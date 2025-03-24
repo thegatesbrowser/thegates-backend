@@ -13,5 +13,6 @@ urlpatterns = [
     path('api/all_gates', gate.all_gates),
     path('api/search', search.search),
     path('api/prompt', search.prompt),
-    path('api/send_logs', logs.send_logs)
+    path('api/search_suggestions', search.search_suggestions),
+    path('api/send_logs', logs.send_logs),
 ]

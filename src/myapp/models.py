@@ -97,3 +97,7 @@ class Users(models.Model):
     user_id = models.TextField(null=True,blank=True)
     country = models.TextField(null=True,blank=True)
     city = models.TextField(null=True,blank=True)
+
+
+class SearchSuggestions(models.Model):
+    query = models.TextField(null=True,blank=True)

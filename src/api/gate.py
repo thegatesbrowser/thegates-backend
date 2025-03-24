@@ -48,7 +48,7 @@ def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
     print("Featured gates:")
     
     fgates_objs = FeaturedGates.objects.all()
-
+    
     titles = [item['title'] for item in fgates_objs.values()]
     print(titles)
     

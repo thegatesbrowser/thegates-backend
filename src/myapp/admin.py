@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Downloads, Events, Gates, FeaturedGates, Users
+from .models import Downloads, Events, Gates, FeaturedGates, Users, SearchSuggestions
 
 class DownloadsAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'gate_app')
@@ -16,8 +16,12 @@ class FeaturedGatesAdmin(admin.ModelAdmin):
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'name', 'email', 'country', 'city')
 
+class SearchSuggestionsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'query')
+
 admin.site.register(Downloads, DownloadsAdmin)
 admin.site.register(Events, EventsAdmin)
 admin.site.register(Gates, GatesAdmin)
 admin.site.register(FeaturedGates, FeaturedGatesAdmin)
 admin.site.register(Users, UsersAdmin)
+admin.site.register(SearchSuggestions, SearchSuggestionsAdmin)

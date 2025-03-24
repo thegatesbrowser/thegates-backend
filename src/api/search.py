@@ -2,7 +2,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django import http
 import requests
 import json
-from myapp.models import Gates, Downloads
+from myapp.models import Gates, Downloads, SearchSuggestions
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q
@@ -13,11 +13,9 @@ from myapp.auth_meilisearch import client as meili_client
 
 # DJANGO ORM
 def get_search_result(query: str) -> str:
-    print(query)
-    
     while '  ' in query:
         query = query.replace('  ',' ')
-    print(query)
+    
     word = query
     gates_query = Q()
     if ' ' in word:
@@ -38,8 +36,8 @@ def get_search_result(query: str) -> str:
     results = []
     search_objects = Gates.objects.filter(gates_query)
     for gate in search_objects:
-         results.append(gate)
-
+        results.append(gate)
+    
     return json.dumps(results, default=vars)
 
 
@@ -57,8 +55,6 @@ def remove_duplicate_hits_by_id(hits):
 
 
 def get_search_result_by_MS(query: str) -> str:
-    print(query)
-    
     user_input = query
     search_results = search_in_meilisearch(user_input)
     words = user_input.split()
@@ -166,6 +162,7 @@ def search(req: http.HttpRequest) -> http.HttpResponse:
         query = requests.utils.unquote(query)
         # if query != '': return http.HttpResponse(content=get_search_result(query))        #   DJANGO ORM
         if query != '': return http.HttpResponse(content=get_search_result_by_MS(query))
+    
     return http.HttpResponse(status=400)
 
 
@@ -175,5 +172,22 @@ def prompt(req: http.HttpRequest) -> http.HttpResponse:
         query = req.GET.get('query', '')
         query = requests.utils.unquote(query)
         if query != '': return http.HttpResponse(content=get_prompt_words(query))
-
+    
     return http.HttpResponse(status=400)
+
+
+@csrf_exempt
+def search_suggestions(req: http.HttpRequest) -> http.HttpResponse:
+    if req.method != 'GET': return http.HttpResponse(status=400)
+    print("Search suggestions:")
+
+    suggestions = SearchSuggestions.objects.all()
+    titles = [item['query'] for item in suggestions.values()]
+    print(titles)
+    
+    result_list = []
+    for suggestion in suggestions:
+        result_list.append(suggestion.query)
+    
+    output_json = json.dumps(result_list, indent=2)
+    return http.HttpResponse(content=output_json)
