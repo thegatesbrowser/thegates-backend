@@ -2,4 +2,4 @@
 
 export PYTHONUNBUFFERED=1
 
-nohup python3 manage.py runserver localhost:8000 &
+nohup python3 src/manage.py runserver localhost:8000 &

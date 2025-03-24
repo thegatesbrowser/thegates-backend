@@ -1,12 +1,11 @@
 staticfiles/*
-project_env/*
-builds/*
 *__pycache__/
+builds/
+venv/
 
-nohup.out
+*nohup.out
 *.sqlite3
 
 # Keys
-*mixpanel.key
-*telegram_bot.key
-*my_telegram_id.key
+*.key
+!keys/empty.key

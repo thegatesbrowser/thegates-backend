@@ -11,20 +11,6 @@ from myapp.auth_meilisearch import index
 from myapp.auth_meilisearch import client as meili_client
 
 
-
-class SearchResult:
-    url: str
-    title: str
-    description: str
-    image: str
-
-    def __init__(self, url, title, description, image) -> None:
-        self.url = url
-        self.title = title
-        self.description = description
-        self.image = image
-
-
 # DJANGO ORM
 def get_search_result(query: str) -> str:
     print(query)
@@ -58,7 +44,6 @@ def get_search_result(query: str) -> str:
 
 
 def search_in_meilisearch(query):
-    
     search_results = index.search(query)['hits']
     return search_results
 
@@ -71,40 +56,9 @@ def remove_duplicate_hits_by_id(hits):
     return list(unique_hits.values())
 
 
-def extract_words_from_json(json_data, user_input, unique_words):
-    user_input = user_input.lower()
-    for attr in ['title', 'description']:
-        if attr in json_data:
-            if attr in json_data['_matchesPosition']:
-                
-                matches = json_data['_matchesPosition'][attr]
-
-                
-                for match in matches:
-                    start = match['start']
-
-                    end = json_data[attr].find(' ', start)
-                    if end == -1:
-                     
-                        end = len(json_data[attr])
-
-                    word = json_data[attr][start:end]
-
-                 
-                    word_lower = word.lower()
-
-                   
-                    if word_lower.startswith(user_input) and word_lower not in unique_words:
-                        word = word.replace(',', '')
-                        unique_words.add(word_lower)
-                        return {'prompt': word}  
-
-    return {}
-
-
 def get_search_result_by_MS(query: str) -> str:
     print(query)
-     
+    
     user_input = query
     search_results = search_in_meilisearch(user_input)
     words = user_input.split()
@@ -156,6 +110,36 @@ def get_search_result_by_MS(query: str) -> str:
     return output_json
 
 
+def extract_words_from_json(json_data, user_input, unique_words):
+    user_input = user_input.lower()
+    for attr in ['title', 'description']:
+        if attr in json_data:
+            if attr in json_data['_matchesPosition']:
+                
+                matches = json_data['_matchesPosition'][attr]
+                
+                for match in matches:
+                    start = match['start']
+
+                    end = json_data[attr].find(' ', start)
+                    if end == -1:
+                     
+                        end = len(json_data[attr])
+
+                    word = json_data[attr][start:end]
+
+                 
+                    word_lower = word.lower()
+
+                   
+                    if word_lower.startswith(user_input) and word_lower not in unique_words:
+                        word = word.replace(',', '')
+                        unique_words.add(word_lower)
+                        return {'prompt': word}  
+
+    return {}
+
+
 def get_prompt_words(query: str) -> str:
     user_input = query
     search_result = index.search(user_input, {
@@ -163,17 +147,15 @@ def get_prompt_words(query: str) -> str:
         'attributesToSearchOn': ["title","description"]
     })
     unique_words = set()
-  
+    
     words_for_user = []
-
+    
     for result in search_result['hits']:
         words = extract_words_from_json(result, user_input, unique_words)
         if words:
             words_for_user.append(words)
-
-   
+    
     output_json = json.dumps(words_for_user, ensure_ascii=False, indent=4)
-
     return output_json
 
 

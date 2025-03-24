@@ -1,7 +1,7 @@
 #!/bin/bash
 # run: 'source set_venv.sh' or ''. set_venv.sh'
 
-VENV_DIR=project_env
+VENV_DIR=venv
 
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virutal environment $VENV_DIR"
