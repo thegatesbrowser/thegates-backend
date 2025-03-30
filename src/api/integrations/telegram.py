@@ -20,9 +20,12 @@ def get_location(ip_address: str):
 def bot_notify_event(data):
     user_id = data.get('user_id')
     event_name = data.get('event_name')
+
+    if event_name != 'application_open':
+        return
     
     telegram_bot_user = TelegramBotUser.objects.filter(user_id=user_id).first()
-    if event_name != 'application_open' or telegram_bot_user.is_ignore:
+    if telegram_bot_user is not None and telegram_bot_user.is_ignore:
         return
     
     ip = data.get('ip')
