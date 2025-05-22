@@ -1,5 +1,5 @@
 #!/bin/bash
-# run: 'source set_venv.sh' or ''. set_venv.sh'
+# run: 'source setup_venv.sh' or ''. setup_venv.sh'
 
 VENV_DIR=venv
 
