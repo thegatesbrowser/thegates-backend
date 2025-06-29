@@ -12,6 +12,7 @@ def update_meilisearch_data(instance):
         'url': instance.url,
         'title': instance.title,
         'description': instance.description,
+        'icon': instance.icon,
         'image': instance.image,
         'resource_pack': instance.resource_pack,
         'number_of_entries': instance.number_of_entries

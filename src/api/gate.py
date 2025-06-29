@@ -16,6 +16,7 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
     url = data['url']
     title = data['title']
     description = data['description']
+    icon = data['icon']
     image = data['image']
     resource_pack = data['resource_pack']
     
@@ -32,6 +33,7 @@ def discover_gate(req: http.HttpRequest) -> http.HttpResponse:
         gate.url = url
         gate.title = title
         gate.description = description
+        gate.icon = icon
         gate.image = image
         gate.resource_pack = resource_pack
         
@@ -59,7 +61,8 @@ def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
             'url': gate_obj.url,
             'title': gate_obj.title,
             'description': gate_obj.description,
-            'image': gate_obj.image,
+            'icon': gate_obj.icon,
+            'image': gate_obj.image
         })
     
     output_json = json.dumps(result_list, indent=2)
@@ -83,6 +86,7 @@ def all_gates(req: http.HttpRequest) -> http.HttpResponse:
             'url': gate_obj.url,
             'title': gate_obj.title,
             'description': gate_obj.description,
+            'icon': gate_obj.icon,
             'image': gate_obj.image,
             'number_of_entries': gate_obj.number_of_entries
         })

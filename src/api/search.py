@@ -71,6 +71,9 @@ def get_search_result_by_MS(query: str) -> str:
         gate_objs = Gates.objects.filter(url__endswith=f"{url}")
         for gate_obj in gate_objs:
             hint['number_of_entries'] = gate_obj.number_of_entries
+        
+        if 'icon' not in hint:
+            hint['icon'] = ""
     
     output_json = json.dumps(all_hits, indent=2)
     if output_json == '[]':
@@ -97,6 +100,7 @@ def get_search_result_by_MS(query: str) -> str:
                     'url': gate_obj.url,
                     'title': gate_obj.title,
                     'description': gate_obj.description,
+                    'icon': gate_obj.icon,
                     'image': gate_obj.image,
                     'resource_pack': gate_obj.resource_pack
                 })

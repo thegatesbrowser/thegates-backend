@@ -38,7 +38,6 @@ class Downloads(models.Model):
 
 
 class Events(models.Model):
-    
     user_id = models.CharField(max_length=100)
     date = models.DateTimeField(default=timezone.now)
     event_name = models.CharField(max_length=50)
@@ -78,6 +77,7 @@ class Gates(models.Model):
     url = models.TextField(null=True,blank=True)
     title = models.TextField(null=True,blank=True)
     description = models.TextField(null=True,blank=True)
+    icon = models.TextField(null=True,blank=True)
     image = models.TextField(null=True,blank=True)
     resource_pack = models.TextField(null=True, blank=True)
     number_of_entries = models.IntegerField(null=True, blank=True)
@@ -88,6 +88,7 @@ class FeaturedGates(models.Model):
     url = models.TextField(null=True,blank=True)
     title = models.TextField(null=True,blank=True)
     description = models.TextField(null=True,blank=True)
+    icon = models.TextField(null=True,blank=True)
     image = models.TextField(null=True,blank=True)
 
 
