@@ -416,7 +416,7 @@ def create_index():
     for table in tables:
         print(table[0]) 
 
-    cursor.execute("SELECT id, title, description, url, image, resource_pack, tags FROM myapp_gates;")
+    cursor.execute("SELECT id, title, description, url, icon, image, resource_pack, tags FROM myapp_gates;")
     rows = cursor.fetchall()
     
     index = meili_client.index('gates')
@@ -428,8 +428,9 @@ def create_index():
             'title': row[1],
             'description': row[2],
             'url': row[3],
-            'image': row[4],
-            'resource_pack': row[5]
+            'icon': row[4],
+            'image': row[5],
+            'resource_pack': row[6]
         }
         print(f'{row[0]}\n{row[1]}\n{row[2]}')
         print('###############################################')
