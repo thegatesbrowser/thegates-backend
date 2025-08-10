@@ -89,7 +89,6 @@ class FeaturedGates(models.Model):
     title = models.TextField(null=True,blank=True)
     description = models.TextField(null=True,blank=True)
     icon = models.TextField(null=True,blank=True)
-    image = models.TextField(null=True,blank=True)
 
 
 class Users(models.Model):

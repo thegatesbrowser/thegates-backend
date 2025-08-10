@@ -11,7 +11,7 @@ class GatesAdmin(admin.ModelAdmin):
     list_display = ('number_of_entries', 'id', 'title', 'description', 'url')
 
 class FeaturedGatesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'description', 'url', 'icon', 'image')
+    list_display = ('id', 'title', 'description', 'url', 'icon')
 
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'name', 'email', 'country', 'city')
