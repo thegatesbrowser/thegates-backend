@@ -62,6 +62,7 @@ def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
             'title': gate_obj.title,
             'description': gate_obj.description,
             'icon': gate_obj.icon,
+            'is_special': gate_obj.is_special
         })
     
     output_json = json.dumps(result_list, indent=2)
