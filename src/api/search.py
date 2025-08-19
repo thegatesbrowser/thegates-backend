@@ -110,6 +110,21 @@ def get_search_result_by_MS(query: str) -> str:
     return output_json
 
 
+def get_suggestions() -> str:
+    print("Search suggestions:")
+
+    suggestions = SearchSuggestions.objects.all()
+    titles = [item['query'] for item in suggestions.values()]
+    print(titles)
+    
+    result_list = []
+    for suggestion in suggestions:
+        result_list.append(suggestion.query)
+    
+    output_json = json.dumps(result_list, indent=2)
+    return output_json
+
+
 def extract_words_from_json(json_data, user_input, unique_words):
     user_input = user_input.lower()
     for attr in ['title', 'description']:
@@ -164,8 +179,14 @@ def search(req: http.HttpRequest) -> http.HttpResponse:
     if req.method == 'GET':
         query = req.GET.get('query', '')
         query = requests.utils.unquote(query)
-        # if query != '': return http.HttpResponse(content=get_search_result(query))        #   DJANGO ORM
-        if query != '': return http.HttpResponse(content=get_search_result_by_MS(query))
+
+        result = {'gates': get_search_result_by_MS(query), 'suggestions': '[]'}
+
+        if result['gates'] == '[]':
+            result['suggestions'] = get_suggestions()
+
+        output_json = json.dumps(result, indent=2)
+        if query != '': return http.HttpResponse(content=output_json)
     
     return http.HttpResponse(status=400)
 
@@ -178,20 +199,3 @@ def prompt(req: http.HttpRequest) -> http.HttpResponse:
         if query != '': return http.HttpResponse(content=get_prompt_words(query))
     
     return http.HttpResponse(status=400)
-
-
-@csrf_exempt
-def search_suggestions(req: http.HttpRequest) -> http.HttpResponse:
-    if req.method != 'GET': return http.HttpResponse(status=400)
-    print("Search suggestions:")
-
-    suggestions = SearchSuggestions.objects.all()
-    titles = [item['query'] for item in suggestions.values()]
-    print(titles)
-    
-    result_list = []
-    for suggestion in suggestions:
-        result_list.append(suggestion.query)
-    
-    output_json = json.dumps(result_list, indent=2)
-    return http.HttpResponse(content=output_json)
