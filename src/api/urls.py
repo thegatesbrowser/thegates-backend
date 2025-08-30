@@ -3,6 +3,7 @@ from . import analytics
 from . import search
 from . import gate
 from . import logs
+from . import uploads
 
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('api/search', search.search),
     path('api/prompt', search.prompt),
     path('api/send_logs', logs.send_logs),
+    path('api/upload_build', uploads.upload_build),
 ]
