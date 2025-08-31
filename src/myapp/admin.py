@@ -14,7 +14,7 @@ class FeaturedGatesAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'description', 'url', 'icon', 'is_special')
 
 class UsersAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'name', 'email', 'country', 'city')
+    list_display = ('id', 'user_id', 'device_id', 'name', 'email', 'country', 'city')
 
 class SearchSuggestionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'query')
