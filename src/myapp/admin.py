@@ -11,10 +11,14 @@ class GatesAdmin(admin.ModelAdmin):
     list_display = ('number_of_entries', 'id', 'title', 'description', 'url')
 
 class FeaturedGatesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'description', 'url', 'icon', 'is_special')
+    list_display = ('sort_order', 'id', 'title', 'description', 'url', 'icon', 'is_special')
+    list_editable = ('sort_order',)
+    list_display_links = ('id', 'title')
+    ordering = ('sort_order', 'id')
 
 class UsersAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'device_id', 'name', 'email', 'country', 'city')
+    search_fields = ('user_id', 'device_id')
 
 class SearchSuggestionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'query')

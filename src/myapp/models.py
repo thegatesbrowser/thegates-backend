@@ -90,6 +90,11 @@ class FeaturedGates(models.Model):
     description = models.TextField(null=True,blank=True)
     icon = models.TextField(null=True,blank=True)
     is_special = models.BooleanField(default=False)
+    # explicit ordering field for admin-controlled position
+    sort_order = models.IntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ['sort_order', 'id']
 
 
 class Users(models.Model):

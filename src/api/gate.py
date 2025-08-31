@@ -50,7 +50,7 @@ def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
     if req.method != 'GET': return http.HttpResponse(status=400)
     print("Featured gates:")
     
-    fgates_objs = FeaturedGates.objects.all()
+    fgates_objs = FeaturedGates.objects.order_by('sort_order', 'id')
     
     titles = [item['title'] for item in fgates_objs.values()]
     print(titles)
