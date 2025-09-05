@@ -8,6 +8,7 @@ from django.db.models import Q
 from myapp.models import Users
 from ua_parser import user_agent_parser
 from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction, IntegrityError
 
 
 def _generate_unique_user_id() -> str:
@@ -39,14 +40,27 @@ def create_user_id(req: http.HttpRequest) -> http.HttpResponse:
         return http.HttpResponse(status=400)
     
     device_id = req.GET.get('device_id')
-    user = Users.objects.filter(device_id=device_id).first() if device_id else None
-    if user is not None:
-        return http.HttpResponse(content=user.user_id)
-    
-    user_id = _generate_unique_user_id()
-    print('generated new user_id ' + user_id)
-    
-    user = Users(user_id=user_id, device_id=device_id)
-    user.save()
-    
-    return http.HttpResponse(content=user_id)
+
+    if not device_id:
+        user_id = _generate_unique_user_id()
+        user = Users(user_id=user_id, device_id=None)
+        user.save()
+
+        print('generated new user_id ' + user_id)
+        return http.HttpResponse(content=user_id)
+
+    # Race-safe creation: try get_or_create in an atomic block; if a concurrent
+    # request creates the same device_id, catch IntegrityError and fetch.
+    was_created = False
+    try:
+        with transaction.atomic():
+            user, created = Users.objects.get_or_create(
+                device_id=device_id,
+                defaults={"user_id": _generate_unique_user_id()},
+            )
+            was_created = created
+    except IntegrityError:
+        user = Users.objects.get(device_id=device_id)
+
+    print('created new' if was_created else 'got existing' + 'user_id ' + user.user_id + ' for device_id ' + device_id)
+    return http.HttpResponse(content=user.user_id)

@@ -100,8 +100,8 @@ class FeaturedGates(models.Model):
 class Users(models.Model):
     name = models.TextField(null=True,blank=True)
     email = models.TextField(null=True,blank=True)
-    user_id = models.TextField(null=True,blank=True)
-    device_id = models.TextField(null=True,blank=True)
+    user_id = models.TextField(null=False, blank=False,default="none")
+    device_id = models.TextField(null=True,blank=True, unique=True)
     country = models.TextField(null=True,blank=True)
     city = models.TextField(null=True,blank=True)
 
