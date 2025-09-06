@@ -62,5 +62,5 @@ def create_user_id(req: http.HttpRequest) -> http.HttpResponse:
     except IntegrityError:
         user = Users.objects.get(device_id=device_id)
 
-    print('created new' if was_created else 'got existing' + 'user_id ' + user.user_id + ' for device_id ' + device_id)
+    print('created new' if was_created else 'got existing', 'user_id ' + user.user_id + ' for device_id ' + device_id)
     return http.HttpResponse(content=user.user_id)
