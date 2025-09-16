@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import re
 from api.integrations import mixpanel
 from api.integrations import telegram
 from django import http
@@ -9,6 +10,20 @@ from myapp.models import Users
 from ua_parser import user_agent_parser
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction, IntegrityError
+
+
+def _extract_os_from_user_agent(req: http.HttpRequest) -> str:
+    # Try to extract OS from "GodotEngine/4.3.1.rc.custom_build (Platform)"
+    user_agent = req.headers.get("User-Agent", "")
+    match = re.search(r'\(([^)]+)\)', user_agent or "")
+    if match:
+        candidate = match.group(1).strip()
+        if candidate:
+            return candidate
+    
+    # Fallback to parsed os family
+    parsed = user_agent_parser.Parse(user_agent or "")
+    return (parsed.get("os", {}) or {}).get("family")
 
 
 def _generate_unique_user_id() -> str:
@@ -23,14 +38,16 @@ def _generate_unique_user_id() -> str:
 def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     if os.getenv('DISABLE_ANALYTICS'): return http.HttpResponse(status=200)
     
-    parsed = user_agent_parser.Parse(req.headers["User-Agent"])
-    
     data = json.loads(req.body)
-    data["$os"] = parsed["os"]["family"]
     data['ip'] = req.META['HTTP_X_REAL_IP']
+    data["$os"] = _extract_os_from_user_agent(req)
+    
+    if data.get('user_id') == 'none':
+        telegram.bot_notify_none_user_id(data.copy())
+        return http.HttpResponse(status=400)
     
     mixpanel.track(data.copy())
-    telegram.bot_notify_event(data.copy())
+    telegram.bot_notify_application_open(data.copy())
     return http.HttpResponse(status=200)
 
 

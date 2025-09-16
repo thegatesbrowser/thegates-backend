@@ -17,7 +17,7 @@ def get_location(ip_address: str):
     return location_data
 
 
-def bot_notify_event(data):
+def bot_notify_application_open(data):
     user_id = data.get('user_id')
     event_name = data.get('event_name')
 
@@ -44,3 +44,23 @@ def bot_notify_event(data):
         print('Message sent:\n' + params['text'])
     else:
         print('Failed to send message:', response.text)
+
+
+def bot_notify_none_user_id(data):
+    ip = data.get('ip')
+    location_data = get_location(ip)
+    city = location_data.get('city')
+    country = location_data.get('country')
+    
+    params = {
+        'chat_id': chat_id,
+        'text': f'Event with \'none\' user_id from {ip} in {city} {country}:\n{data}'
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        print('Message sent:\n' + params['text'])
+    else:
+        print('Failed to send message:', response.text)
+        return
