@@ -4,6 +4,7 @@ from . import search
 from . import gate
 from . import logs
 from . import uploads
+from . import renderer_downloads
 
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path('api/prompt', search.prompt),
     path('api/send_logs', logs.send_logs),
     path('api/upload_build', uploads.upload_build),
+    path('api/download_renderer/<str:platform>-<str:version>', renderer_downloads.download_renderer),
 ]
