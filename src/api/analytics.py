@@ -3,7 +3,7 @@ import json
 import uuid
 import re
 from api.integrations import mixpanel
-from api.integrations import telegram
+from api.integrations import notifications
 from django import http
 from django.db.models import Q
 from myapp.models import Users
@@ -43,11 +43,11 @@ def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
     data["$os"] = _extract_os_from_user_agent(req)
     
     if data.get('user_id') == 'none':
-        telegram.bot_notify_none_user_id(data.copy())
+        print('Error: Event with \'none\' user_id')
         return http.HttpResponse(status=400)
     
     mixpanel.track(data.copy())
-    telegram.bot_notify_application_open(data.copy())
+    notifications.notify_application_open(data.copy())
     return http.HttpResponse(status=200)
 
 

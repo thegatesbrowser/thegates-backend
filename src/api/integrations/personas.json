@@ -1,0 +1,50 @@
+{
+  "adjectives": [
+    "Brave", "Clever", "Swift", "Gentle", "Merry", "Quiet", "Nimble", "Sunny", "Lucky", "Curious",
+    "Bright", "Bold", "Kind", "Calm", "Happy", "Witty", "Chill", "Breezy", "Jolly", "Cosmic",
+    "Radiant", "Vivid", "Lively", "Daring", "Stellar", "Serene", "Blissful", "Noble", "Regal", "Keen",
+    "Sincere", "Friendly", "Playful", "Spirited", "Dazzling", "Dynamic", "Earnest", "Fearless", "Gentle", "Hearty",
+    "Joyful", "Luminous", "Majestic", "Neat", "Optimistic", "Peppy", "Quirky", "Rosy", "Sparkling", "Tender",
+    "Upbeat", "Vibrant", "Warm", "Xenial", "Youthful", "Zesty", "Bouncy", "Candid", "Dreamy", "Eager",
+    "Frolicsome", "Gleeful", "Honest", "Inventive", "Jaunty", "Kindhearted", "Lively", "Mellow", "Nifty", "Openhanded",
+    "Plucky", "Quick", "Radiant", "Sunny", "Truthful", "Unique", "Valiant", "Whimsical", "Excited", "Festive",
+    "Gallant", "Humble", "Inspired", "Jubilant", "Keen", "Loyal", "Merry", "Nimble", "Observant", "Patient",
+    "Quiet", "Resolute", "Sanguine", "Thoughtful", "Uplifted", "Vigorous", "Warmhearted", "Xtraordinary", "Youthful", "Zany",
+    "Adventurous", "Blissful", "Cheerful", "Delightful", "Effervescent", "Fierce", "Glowing", "Harmonic", "Iridescent", "Jazzy",
+    "Kindly", "Lighthearted", "Magnetic", "Noble", "Opal", "Peaceful", "Quick-witted", "Rosy", "Shining", "Tenderhearted",
+    "Utopian", "Vivid", "Winsome", "Xoomy", "Yearning", "Zingy"
+  ],
+  "animals": [
+    "Fox", "Panda", "Otter", "Dolphin", "Hedgehog", "Falcon", "Wolf", "Tiger", "Koala", "Penguin",
+    "Lion", "Leopard", "Owl", "Bear", "Rabbit", "Turtle", "Hummingbird", "Starling", "Lynx", "Orca",
+    "Eagle", "Hawk", "Moose", "Deer", "Bison", "Buffalo", "Horse", "Zebra", "Giraffe", "Elephant",
+    "Rhinoceros", "Hippo", "Cheetah", "Jaguar", "Panther", "Cougar", "Bobcat", "Wolverine", "Badger", "Marten",
+    "Weasel", "Seal", "Walrus", "Manatee", "SeaLion", "Shark", "Ray", "Stingray", "Sturgeon", "Salmon",
+    "Trout", "Carp", "Catfish", "Pike", "Barracuda", "Marlin", "Swordfish", "Tuna", "Mackerel", "Halibut",
+    "Crab", "Lobster", "Shrimp", "Octopus", "Squid", "Cuttlefish", "Nautilus", "Starfish", "Seahorse", "Jellyfish",
+    "Ant", "Bee", "Beetle", "Dragonfly", "Butterfly", "Moth", "Grasshopper", "Ladybug", "Cricket", "Firefly",
+    "Sparrow", "Robin", "Bluebird", "Cardinal", "Finch", "Canary", "Crow", "Raven", "Magpie", "Jay",
+    "Parrot", "Macaw", "Cockatoo", "Toucan", "Pelican", "Albatross", "Swan", "Goose", "Duck", "Flamingo",
+    "Peacock", "Turkey", "Chicken", "Rooster", "Pheasant", "Quail", "Dove", "Pigeon", "Heron", "Crane",
+    "Ibis", "Egret", "Kiwi", "Emu", "Ostrich", "Kangaroo", "Wallaby", "Koala", "Platypus", "Wombat",
+    "Armadillo", "Sloth", "Anteater", "Tapir", "Okapi", "Camel", "Llama", "Alpaca", "Goat", "Sheep",
+    "Cow", "Pig", "Boar", "Dog", "Cat", "Ferret", "Hamster", "GuineaPig", "Chinchilla", "Hare"
+  ],
+  "emojis": [
+    "🦊", "🐼", "🦦", "🐬", "🦔", "🦅", "🐺", "🐯", "🐨", "🐧",
+    "🦁", "🐆", "🦉", "🐻", "🐰", "🐢", "🐦", "🕊️", "🐱", "🐶",
+    "🐭", "🐹", "🦇", "🐸", "🐍", "🦎", "🦂", "🕷️", "🦗", "🪲",
+    "🪳", "🦋", "🐞", "🐝", "🐜", "🪰", "🦟", "🐌", "🐙", "🦑",
+    "🦐", "🦞", "🦀", "🐡", "🐠", "🐟", "🐳", "🐋", "🦈", "🐊",
+    "🦧", "🦍", "🦣", "🦏", "🦛", "🐘", "🫎", "🦌", "🦬", "🐂",
+    "🐃", "🐄", "🐎", "🦓", "🦒", "🦘", "🦨", "🦡", "🦫", "🦦",
+    "🦥", "🦨", "🦝", "🦚", "🦜", "🕊️", "🦢", "🦩", "🦆", "🦅",
+    "🦉", "🦤", "🦇", "🐉", "🐲", "⭐", "✨", "🌟", "💫", "🎉",
+    "🎊", "🎈", "🔥", "⚡", "🌈", "🌍", "🌎", "🌏", "🪐", "🌙",
+    "☀️", "⭐", "❄️", "☃️", "💎", "💖", "💜", "💙", "💚", "🧡",
+    "💛", "🤍", "🤎", "🖤", "🤩", "😺", "😸", "😻", "😀", "😄",
+    "😎", "😇", "🤠", "🥳", "🧭", "🗺️", "🏞️", "🌋", "🏝️", "🏔️"
+  ]
+}
+
+
