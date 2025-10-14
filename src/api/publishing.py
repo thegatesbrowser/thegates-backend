@@ -1,4 +1,6 @@
 import os
+import fcntl
+from contextlib import contextmanager
 from typing import Dict, List
 
 from django import http
@@ -17,6 +19,10 @@ _ALLOWED_EXTENSIONS: Dict[str, int] = {
     ".png": 30 * 1024 * 1024,
     ".zip": 500 * 1024 * 1024,
 }
+
+# Persistent counter storage for publishing user ids
+_COUNTER_DIR = os.path.join(PUBLISHED_BASE_DIR, "_meta")
+_COUNTER_FILE = os.path.join(_COUNTER_DIR, "user_counter.txt")
 
 
 def _safe_segment(value: str, fallback: str) -> str:
@@ -42,6 +48,55 @@ def _build_url(base_url: str, relative_path: str) -> str:
     base = base_url.rstrip("/")
     rel = relative_path.lstrip("/")
     return f"{base}/{rel}"
+
+
+@contextmanager
+def _locked_file(path: str):
+    _ensure_directory(os.path.dirname(path))
+    f = open(path, "a+")  # create if missing
+    try:
+        f.seek(0)
+        fcntl.flock(f, fcntl.LOCK_EX)
+        yield f
+    finally:
+        try:
+            f.flush()
+            os.fsync(f.fileno())
+        except Exception:
+            pass
+        try:
+            fcntl.flock(f, fcntl.LOCK_UN)
+        finally:
+            f.close()
+
+
+def _increment_user_count() -> int:
+    with _locked_file(_COUNTER_FILE) as f:
+        content = f.read().strip()
+        try:
+            current_value = int(content) if content else 0
+        except ValueError:
+            current_value = 0
+        next_value = current_value + 1
+        f.seek(0)
+        f.truncate()
+        f.write(str(next_value))
+        return next_value
+
+
+@csrf_exempt
+def create_publishing_user_id(request: http.HttpRequest) -> http.HttpResponse:
+    if request.method != "POST":
+        return http.HttpResponse(status=405)
+
+    next_number = _increment_user_count()
+    user_id = f"user_{next_number}"
+    return http.JsonResponse({
+        "status": "ok",
+        "code": "created",
+        "user_id": user_id,
+        "number": next_number,
+    }, status=201)
 
 
 def _is_truthy(value: str | None) -> bool:
@@ -149,7 +204,7 @@ def publish_project(request: http.HttpRequest) -> http.HttpResponse:
 
 
 @csrf_exempt
-def check_project(request: http.HttpRequest) -> http.HttpResponse:
+def get_published_project(request: http.HttpRequest) -> http.HttpResponse:
     if request.method != "GET":
         return http.HttpResponse(status=405)
 
