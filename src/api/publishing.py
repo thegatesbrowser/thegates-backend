@@ -6,9 +6,8 @@ from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 
 
-PUBLISHED_BASE_DIR = \
-    "/home/nordup/projects/thegates-folder/thegates-backend/staticfiles/devs/published"
-PROJECT_ROOT = "/home/nordup/projects/thegates-folder/thegates-backend"
+PUBLISHED_BASE_DIR = "/home/nordup/projects/thegates-folder/thegates-backend/staticfiles/published"
+STATICFILES_DIR = "/home/nordup/projects/thegates-folder/thegates-backend/staticfiles"
 LOCAL_BASE_URL = "http://127.0.0.1:8000/"
 PUBLIC_BASE_URL = "https://thegates.io/worlds"
 
@@ -58,13 +57,6 @@ def _save_uploaded_file(destination: str, uploaded_file) -> None:
     with open(destination, "wb") as dest:
         for chunk in uploaded_file.chunks():
             dest.write(chunk)
-
-
-def _path_from_project_root(path: str) -> str:
-    relative = os.path.relpath(path, PROJECT_ROOT)
-    if not relative.startswith("staticfiles/"):
-        return os.path.join("staticfiles", relative)
-    return relative
 
 
 def _build_url(base_url: str, relative_path: str) -> str:
@@ -163,8 +155,8 @@ def publish_project(request: http.HttpRequest) -> http.HttpResponse:
         filename = os.path.basename(uploaded.name or "")
         destination = os.path.join(target_dir, filename)
         _save_uploaded_file(destination, uploaded)
-        relative_path = _path_from_project_root(destination)
         if gate_file_url is None and filename.lower().endswith(".gate"):
+            relative_path = os.path.relpath(destination, STATICFILES_DIR)
             gate_file_url = _build_url(_gate_base_url(), relative_path)
 
     return http.JsonResponse(
@@ -175,5 +167,3 @@ def publish_project(request: http.HttpRequest) -> http.HttpResponse:
         },
         status=201,
     )
-
-
