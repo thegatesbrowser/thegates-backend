@@ -19,5 +19,6 @@ urlpatterns = [
     path('api/send_logs', logs.send_logs),
     path('api/upload_build', uploads.upload_build),
     path('api/publish_project', publishing.publish_project),
+    path('api/check_project', publishing.check_project),
     path('api/download_renderer/<str:platform>-<str:version>', renderer_downloads.download_renderer),
 ]

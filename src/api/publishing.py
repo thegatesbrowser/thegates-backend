@@ -11,27 +11,6 @@ STATICFILES_DIR = "/home/nordup/projects/thegates-folder/thegates-backend/static
 LOCAL_BASE_URL = "http://127.0.0.1:8000/"
 PUBLIC_BASE_URL = "https://thegates.io/worlds"
 
-"""Response reference
-
-Success:
-    HTTP 201, code "published":
-        {"status": "ok", "code": "published", "url": "https://.../staticfiles/.../project.gate"}
-
-Errors:
-    HTTP 400, code "missing_user_id":
-        {"status": "error", "code": "missing_user_id", "message": "Missing user_id"}
-    HTTP 400, code "missing_project_name":
-        {"status": "error", "code": "missing_project_name", "message": "Missing project_name"}
-    HTTP 400, code "no_files":
-        {"status": "error", "code": "no_files", "message": "No files uploaded"}
-    HTTP 400, code "unsupported_file_type":
-        {"status": "error", "code": "unsupported_file_type", "message": "Unsupported file type", "filename": "..."}
-    HTTP 400, code "file_too_large":
-        {"status": "error", "code": "file_too_large", "message": "File exceeds maximum allowed size", "filename": "...", "limit_bytes": 0, "actual_bytes": 0}
-    HTTP 400, code "missing_required_extensions":
-        {"status": "error", "code": "missing_required_extensions", "message": "Missing required file types", "missing_extensions": [".gate", ".zip"]}
-"""
-
 # Maximum sizes (in bytes) per extension
 _ALLOWED_EXTENSIONS: Dict[str, int] = {
     ".gate": 10 * 1024 * 1024,
@@ -166,4 +145,47 @@ def publish_project(request: http.HttpRequest) -> http.HttpResponse:
             "url": gate_file_url,
         },
         status=201,
+    )
+
+
+@csrf_exempt
+def check_project(request: http.HttpRequest) -> http.HttpResponse:
+    if request.method != "GET":
+        return http.HttpResponse(status=405)
+
+    user_id = request.GET.get("user_id", "")
+    project_name = request.GET.get("project_name", "")
+
+    if not user_id.strip():
+        return _error_response("missing_user_id", "Missing user_id")
+    if not project_name.strip():
+        return _error_response("missing_project_name", "Missing project_name")
+
+    user_dir = _safe_segment(user_id, "user")
+    project_dir = _safe_segment(project_name, "project")
+    project_path = os.path.join(PUBLISHED_BASE_DIR, user_dir, project_dir)
+
+    gate_path = None
+    if os.path.isdir(project_path):
+        for candidate in os.listdir(project_path):
+            if candidate.lower().endswith(".gate"):
+                gate_path = os.path.join(project_path, candidate)
+                break
+
+    if not gate_path:
+        return _error_response(
+            "not_found",
+            "Published project not found",
+            http_status=404,
+        )
+
+    relative_path = os.path.relpath(gate_path, STATICFILES_DIR)
+    gate_url = _build_url(_gate_base_url(), relative_path)
+
+    return http.JsonResponse(
+        {
+            "status": "ok",
+            "code": "published",
+            "url": gate_url,
+        }
     )
