@@ -36,7 +36,7 @@ def _generate_unique_user_id() -> str:
 
 @csrf_exempt
 def analytics_event(req: http.HttpRequest) -> http.HttpResponse:
-    if os.getenv('DISABLE_ANALYTICS'): return http.HttpResponse(status=200)
+    if os.getenv('SERVER_LOCAL'): return http.HttpResponse(status=200)
     
     data = json.loads(req.body)
     data['ip'] = req.META['HTTP_X_REAL_IP']

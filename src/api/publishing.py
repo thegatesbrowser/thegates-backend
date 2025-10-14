@@ -1,0 +1,179 @@
+import os
+from typing import Dict, List
+
+from django import http
+from django.utils.text import slugify
+from django.views.decorators.csrf import csrf_exempt
+
+
+PUBLISHED_BASE_DIR = \
+    "/home/nordup/projects/thegates-folder/thegates-backend/staticfiles/devs/published"
+PROJECT_ROOT = "/home/nordup/projects/thegates-folder/thegates-backend"
+LOCAL_BASE_URL = "http://127.0.0.1:8000/"
+PUBLIC_BASE_URL = "https://thegates.io/worlds"
+
+"""Response reference
+
+Success:
+    HTTP 201, code "published":
+        {"status": "ok", "code": "published", "url": "https://.../staticfiles/.../project.gate"}
+
+Errors:
+    HTTP 400, code "missing_user_id":
+        {"status": "error", "code": "missing_user_id", "message": "Missing user_id"}
+    HTTP 400, code "missing_project_name":
+        {"status": "error", "code": "missing_project_name", "message": "Missing project_name"}
+    HTTP 400, code "no_files":
+        {"status": "error", "code": "no_files", "message": "No files uploaded"}
+    HTTP 400, code "unsupported_file_type":
+        {"status": "error", "code": "unsupported_file_type", "message": "Unsupported file type", "filename": "..."}
+    HTTP 400, code "file_too_large":
+        {"status": "error", "code": "file_too_large", "message": "File exceeds maximum allowed size", "filename": "...", "limit_bytes": 0, "actual_bytes": 0}
+    HTTP 400, code "missing_required_extensions":
+        {"status": "error", "code": "missing_required_extensions", "message": "Missing required file types", "missing_extensions": [".gate", ".zip"]}
+"""
+
+# Maximum sizes (in bytes) per extension
+_ALLOWED_EXTENSIONS: Dict[str, int] = {
+    ".gate": 10 * 1024 * 1024,
+    ".png": 30 * 1024 * 1024,
+    ".zip": 500 * 1024 * 1024,
+}
+
+
+def _safe_segment(value: str, fallback: str) -> str:
+    # slugify enforces [a-z0-9-]+; fall back if nothing remains
+    candidate = slugify(str(value or "").strip())
+    if candidate:
+        return candidate
+    fallback_candidate = slugify(fallback.strip())
+    return fallback_candidate or "default"
+
+
+def _ensure_directory(path: str) -> None:
+    os.makedirs(path, exist_ok=True)
+
+
+def _save_uploaded_file(destination: str, uploaded_file) -> None:
+    with open(destination, "wb") as dest:
+        for chunk in uploaded_file.chunks():
+            dest.write(chunk)
+
+
+def _path_from_project_root(path: str) -> str:
+    relative = os.path.relpath(path, PROJECT_ROOT)
+    if not relative.startswith("staticfiles/"):
+        return os.path.join("staticfiles", relative)
+    return relative
+
+
+def _build_url(base_url: str, relative_path: str) -> str:
+    base = base_url.rstrip("/")
+    rel = relative_path.lstrip("/")
+    return f"{base}/{rel}"
+
+
+def _is_truthy(value: str | None) -> bool:
+    if value is None:
+        return False
+    return value.lower() in {"1", "true", "yes", "on"}
+
+
+def _gate_base_url() -> str:
+    if _is_truthy(os.getenv("SERVER_LOCAL")):
+        return LOCAL_BASE_URL
+    return PUBLIC_BASE_URL
+
+
+def _error_response(code: str, message: str, http_status: int = 400, **extra) -> http.JsonResponse:
+    payload = {"status": "error", "code": code, "message": message}
+    payload.update(extra)
+    return http.JsonResponse(payload, status=http_status)
+
+
+def _validate_files(files: List) -> http.JsonResponse | None:
+    for uploaded in files:
+        filename = os.path.basename(uploaded.name or "")
+        _, ext = os.path.splitext(filename)
+        ext = ext.lower()
+        if ext not in _ALLOWED_EXTENSIONS:
+            return _error_response(
+                "unsupported_file_type",
+                "Unsupported file type",
+                filename=filename,
+                allowed_extensions=sorted(_ALLOWED_EXTENSIONS.keys()),
+            )
+        max_size = _ALLOWED_EXTENSIONS[ext]
+        if uploaded.size is not None and uploaded.size > max_size:
+            return _error_response(
+                "file_too_large",
+                "File exceeds maximum allowed size",
+                filename=filename,
+                limit_bytes=max_size,
+                actual_bytes=uploaded.size,
+            )
+    return None
+
+
+@csrf_exempt
+def publish_project(request: http.HttpRequest) -> http.HttpResponse:
+    if request.method != "POST":
+        return http.HttpResponse(status=405)
+
+    user_id = request.POST.get("user_id", "")
+    project_name = request.POST.get("project_name", "")
+    files = request.FILES.getlist("files") if hasattr(request, "FILES") else []
+
+    if not user_id.strip():
+        return _error_response("missing_user_id", "Missing user_id")
+    if not project_name.strip():
+        return _error_response("missing_project_name", "Missing project_name")
+    if not files:
+        return _error_response("no_files", "No files uploaded")
+
+    validation_response = _validate_files(files)
+    if validation_response:
+        return validation_response
+
+    extensions_present = set()
+    for uploaded in files:
+        _, ext = os.path.splitext(os.path.basename(uploaded.name or ""))
+        extensions_present.add(ext.lower())
+
+    missing_exts = []
+    for required in (".gate", ".zip"):
+        if required not in extensions_present:
+            missing_exts.append(required)
+
+    if missing_exts:
+        return _error_response(
+            "missing_required_extensions",
+            "Missing required file types",
+            missing_extensions=missing_exts,
+        )
+
+    user_dir = _safe_segment(user_id, "user")
+    project_dir = _safe_segment(project_name, "project")
+    target_dir = os.path.join(PUBLISHED_BASE_DIR, user_dir, project_dir)
+
+    _ensure_directory(target_dir)
+
+    gate_file_url = None
+    for uploaded in files:
+        filename = os.path.basename(uploaded.name or "")
+        destination = os.path.join(target_dir, filename)
+        _save_uploaded_file(destination, uploaded)
+        relative_path = _path_from_project_root(destination)
+        if gate_file_url is None and filename.lower().endswith(".gate"):
+            gate_file_url = _build_url(_gate_base_url(), relative_path)
+
+    return http.JsonResponse(
+        {
+            "status": "ok",
+            "code": "published",
+            "url": gate_file_url,
+        },
+        status=201,
+    )
+
+
