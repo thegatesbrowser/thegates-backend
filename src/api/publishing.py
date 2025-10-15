@@ -4,12 +4,15 @@ from contextlib import contextmanager
 from typing import Dict, List
 
 from django import http
+from django.conf import settings
 from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 
 
-PUBLISHED_BASE_DIR = "/home/nordup/projects/thegates-folder/thegates-backend/staticfiles/published"
-STATICFILES_DIR = "/home/nordup/projects/thegates-folder/thegates-backend/staticfiles"
+# Resolve storage paths from Django settings instead of hard-coded absolute paths
+STATICFILES_DIR = getattr(settings, "STATIC_ROOT", os.path.join(settings.BASE_DIR, "staticfiles"))
+PUBLISHED_BASE_DIR = os.path.join(STATICFILES_DIR, "published")
+
 LOCAL_BASE_URL = "http://127.0.0.1:8000/"
 PUBLIC_BASE_URL = "https://thegates.io/worlds"
 
