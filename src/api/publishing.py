@@ -1,12 +1,15 @@
 import os
-import fcntl
-from contextlib import contextmanager
+import secrets
+import shutil
+import uuid
 from typing import Dict, List
 
 from django import http
 from django.conf import settings
-from django.utils.text import slugify
+from django.db import IntegrityError, transaction
 from django.views.decorators.csrf import csrf_exempt
+
+from myapp.models import PublishingProject
 
 
 # Resolve storage paths from Django settings instead of hard-coded absolute paths
@@ -23,22 +26,24 @@ _ALLOWED_EXTENSIONS: Dict[str, int] = {
     ".zip": 500 * 1024 * 1024,
 }
 
-# Persistent counter storage for publishing user ids
-_COUNTER_DIR = os.path.join(PUBLISHED_BASE_DIR, "_meta")
-_COUNTER_FILE = os.path.join(_COUNTER_DIR, "user_counter.txt")
+
+def _generate_project_id() -> str:
+    return uuid.uuid4().hex
 
 
-def _safe_segment(value: str, fallback: str) -> str:
-    # slugify enforces [a-z0-9-]+; fall back if nothing remains
-    candidate = slugify(str(value or "").strip())
-    if candidate:
-        return candidate
-    fallback_candidate = slugify(fallback.strip())
-    return fallback_candidate or "default"
+def _generate_token() -> str:
+    # token_urlsafe(32) produces ~43 char tokens, well within the model limit
+    return secrets.token_urlsafe(32)
 
 
 def _ensure_directory(path: str) -> None:
     os.makedirs(path, exist_ok=True)
+
+
+def _reset_directory(path: str) -> None:
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    _ensure_directory(path)
 
 
 def _save_uploaded_file(destination: str, uploaded_file) -> None:
@@ -53,55 +58,6 @@ def _build_url(base_url: str, relative_path: str) -> str:
     return f"{base}/{rel}"
 
 
-@contextmanager
-def _locked_file(path: str):
-    _ensure_directory(os.path.dirname(path))
-    f = open(path, "a+")  # create if missing
-    try:
-        f.seek(0)
-        fcntl.flock(f, fcntl.LOCK_EX)
-        yield f
-    finally:
-        try:
-            f.flush()
-            os.fsync(f.fileno())
-        except Exception:
-            pass
-        try:
-            fcntl.flock(f, fcntl.LOCK_UN)
-        finally:
-            f.close()
-
-
-def _increment_user_count() -> int:
-    with _locked_file(_COUNTER_FILE) as f:
-        content = f.read().strip()
-        try:
-            current_value = int(content) if content else 0
-        except ValueError:
-            current_value = 0
-        next_value = current_value + 1
-        f.seek(0)
-        f.truncate()
-        f.write(str(next_value))
-        return next_value
-
-
-@csrf_exempt
-def create_publishing_user_id(request: http.HttpRequest) -> http.HttpResponse:
-    if request.method != "POST":
-        return http.HttpResponse(status=405)
-
-    next_number = _increment_user_count()
-    user_id = f"user_{next_number}"
-    return http.JsonResponse({
-        "status": "ok",
-        "code": "created",
-        "user_id": user_id,
-        "number": next_number,
-    }, status=201)
-
-
 def _is_truthy(value: str | None) -> bool:
     if value is None:
         return False
@@ -114,10 +70,27 @@ def _gate_base_url() -> str:
     return PUBLIC_BASE_URL
 
 
+def _build_project_url(project_id: str, filename: str) -> str:
+    return _build_url(_gate_base_url(), f"{project_id}/{filename}")
+
+
 def _error_response(code: str, message: str, http_status: int = 400, **extra) -> http.JsonResponse:
     payload = {"status": "error", "code": code, "message": message}
     payload.update(extra)
     return http.JsonResponse(payload, status=http_status)
+
+
+def _alloc_project() -> PublishingProject:
+    # Attempt a few times to avoid rare collisions
+    for _ in range(5):
+        token = _generate_token()
+        project_id = _generate_project_id()
+        try:
+            with transaction.atomic():
+                return PublishingProject.objects.create(token=token, project_id=project_id)
+        except IntegrityError:
+            continue
+    raise RuntimeError("unable_to_allocate_project")
 
 
 def _validate_files(files: List) -> http.JsonResponse | None:
@@ -145,35 +118,55 @@ def _validate_files(files: List) -> http.JsonResponse | None:
 
 
 @csrf_exempt
+def create_project(request: http.HttpRequest) -> http.HttpResponse:
+    if request.method != "POST":
+        return http.HttpResponse(status=405)
+
+    try:
+        project = _alloc_project()
+    except RuntimeError:
+        return _error_response(
+            "allocation_failed",
+            "Unable to allocate project. Please retry.",
+            http_status=500,
+        )
+
+    return http.JsonResponse(
+        {
+            "status": "ok",
+            "code": "created",
+            "project_id": project.project_id,
+            "token": project.token,
+        },
+        status=201,
+    )
+
+
+@csrf_exempt
 def publish_project(request: http.HttpRequest) -> http.HttpResponse:
     if request.method != "POST":
         return http.HttpResponse(status=405)
 
-    user_id = request.POST.get("user_id", "")
-    project_name = request.POST.get("project_name", "")
+    token = request.POST.get("token", "").strip()
     files = request.FILES.getlist("files") if hasattr(request, "FILES") else []
 
-    if not user_id.strip():
-        return _error_response("missing_user_id", "Missing user_id")
-    if not project_name.strip():
-        return _error_response("missing_project_name", "Missing project_name")
+    if not token:
+        return _error_response("missing_token", "Missing project token")
     if not files:
         return _error_response("no_files", "No files uploaded")
+
+    try:
+        project = PublishingProject.objects.get(token=token)
+    except PublishingProject.DoesNotExist:
+        return _error_response("invalid_token", "Unknown project token", http_status=404)
 
     validation_response = _validate_files(files)
     if validation_response:
         return validation_response
 
-    extensions_present = set()
-    for uploaded in files:
-        _, ext = os.path.splitext(os.path.basename(uploaded.name or ""))
-        extensions_present.add(ext.lower())
+    extensions_present = {os.path.splitext(os.path.basename(uploaded.name or ""))[1].lower() for uploaded in files}
 
-    missing_exts = []
-    for required in (".gate", ".zip"):
-        if required not in extensions_present:
-            missing_exts.append(required)
-
+    missing_exts = [ext for ext in (".gate", ".zip") if ext not in extensions_present]
     if missing_exts:
         return _error_response(
             "missing_required_extensions",
@@ -181,26 +174,32 @@ def publish_project(request: http.HttpRequest) -> http.HttpResponse:
             missing_extensions=missing_exts,
         )
 
-    user_dir = _safe_segment(user_id, "user")
-    project_dir = _safe_segment(project_name, "project")
-    target_dir = os.path.join(PUBLISHED_BASE_DIR, user_dir, project_dir)
+    target_dir = os.path.join(PUBLISHED_BASE_DIR, project.project_id)
+    _reset_directory(target_dir)
 
-    _ensure_directory(target_dir)
-
-    gate_file_url = None
+    gate_filename = None
     for uploaded in files:
         filename = os.path.basename(uploaded.name or "")
         destination = os.path.join(target_dir, filename)
         _save_uploaded_file(destination, uploaded)
-        if gate_file_url is None and filename.lower().endswith(".gate"):
-            relative_path = os.path.relpath(destination, STATICFILES_DIR)
-            gate_file_url = _build_url(_gate_base_url(), relative_path)
+        if filename.lower().endswith(".gate"):
+            gate_filename = filename
 
+    if gate_filename is None:
+        return _error_response(
+            "missing_gate_file",
+            "Published content must include a .gate file",
+        )
+
+    gate_url = _build_project_url(project.project_id, gate_filename)
+    project.published_url = gate_url
+    project.save(update_fields=["published_url", "updated_at"])
     return http.JsonResponse(
         {
             "status": "ok",
             "code": "published",
-            "url": gate_file_url,
+            "project_id": project.project_id,
+            "url": gate_url,
         },
         status=201,
     )
@@ -211,39 +210,24 @@ def get_published_project(request: http.HttpRequest) -> http.HttpResponse:
     if request.method != "GET":
         return http.HttpResponse(status=405)
 
-    user_id = request.GET.get("user_id", "")
-    project_name = request.GET.get("project_name", "")
+    token = request.GET.get("token", "").strip()
 
-    if not user_id.strip():
-        return _error_response("missing_user_id", "Missing user_id")
-    if not project_name.strip():
-        return _error_response("missing_project_name", "Missing project_name")
+    if not token:
+        return _error_response("missing_token", "Missing project token")
 
-    user_dir = _safe_segment(user_id, "user")
-    project_dir = _safe_segment(project_name, "project")
-    project_path = os.path.join(PUBLISHED_BASE_DIR, user_dir, project_dir)
+    try:
+        project = PublishingProject.objects.get(token=token)
+    except PublishingProject.DoesNotExist:
+        return _error_response("not_found", "Project not found", http_status=404)
 
-    gate_path = None
-    if os.path.isdir(project_path):
-        for candidate in os.listdir(project_path):
-            if candidate.lower().endswith(".gate"):
-                gate_path = os.path.join(project_path, candidate)
-                break
-
-    if not gate_path:
-        return _error_response(
-            "not_found",
-            "Published project not found",
-            http_status=404,
-        )
-
-    relative_path = os.path.relpath(gate_path, STATICFILES_DIR)
-    gate_url = _build_url(_gate_base_url(), relative_path)
+    if not project.published_url:
+        return _error_response("not_found", "Published project not found", http_status=404)
 
     return http.JsonResponse(
         {
             "status": "ok",
             "code": "published",
-            "url": gate_url,
+            "url": project.published_url,
+            "project_id": project.project_id,
         }
     )
