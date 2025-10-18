@@ -118,7 +118,7 @@ class TelegramBotUser(models.Model):
 
 class PublishingProject(models.Model):
     token = models.CharField(max_length=64, unique=True)
-    project_id = models.CharField(max_length=64, unique=True)
+    project_id = models.CharField(max_length=16, unique=True)
     published_url = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

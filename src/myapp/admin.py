@@ -1,6 +1,15 @@
 from django.contrib import admin
 from django.db import models
-from .models import Downloads, Events, Gates, FeaturedGates, Users, SearchSuggestions, TelegramBotUser
+from .models import (
+    Downloads,
+    Events,
+    Gates,
+    FeaturedGates,
+    PublishingProject,
+    SearchSuggestions,
+    TelegramBotUser,
+    Users,
+)
 
 class DownloadsAdmin(admin.ModelAdmin):
     list_display = ('id', 'date', 'gate_app')
@@ -66,6 +75,13 @@ class SearchSuggestionsAdmin(admin.ModelAdmin):
 class TelegramBotUserAdmin(admin.ModelAdmin):
     list_display = ('id', 'user_id', 'description', 'is_ignore')
 
+
+class PublishingProjectAdmin(admin.ModelAdmin):
+    list_display = ('id', 'project_id', 'token', 'published_url', 'updated_at')
+    search_fields = ('project_id', 'token', 'published_url')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('-updated_at',)
+
 admin.site.register(Downloads, DownloadsAdmin)
 admin.site.register(Events, EventsAdmin)
 admin.site.register(Gates, GatesAdmin)
@@ -73,3 +89,4 @@ admin.site.register(FeaturedGates, FeaturedGatesAdmin)
 admin.site.register(Users, UsersAdmin)
 admin.site.register(SearchSuggestions, SearchSuggestionsAdmin)
 admin.site.register(TelegramBotUser, TelegramBotUserAdmin)
+admin.site.register(PublishingProject, PublishingProjectAdmin)

@@ -1,7 +1,7 @@
 import os
 import secrets
 import shutil
-import uuid
+import string
 from typing import Dict, List
 
 from django import http
@@ -26,14 +26,18 @@ _ALLOWED_EXTENSIONS: Dict[str, int] = {
     ".zip": 500 * 1024 * 1024,
 }
 
-
-def _generate_project_id() -> str:
-    return uuid.uuid4().hex
+PROJECT_ID_MIN_LENGTH = 6
+PROJECT_ID_MAX_ATTEMPTS = 50
+_PROJECT_ID_CHARSET = string.ascii_lowercase + string.digits
 
 
 def _generate_token() -> str:
     # token_urlsafe(32) produces ~43 char tokens, well within the model limit
     return secrets.token_urlsafe(32)
+
+
+def _generate_project_id(length: int) -> str:
+    return "".join(secrets.choice(_PROJECT_ID_CHARSET) for _ in range(length))
 
 
 def _ensure_directory(path: str) -> None:
@@ -71,7 +75,7 @@ def _gate_base_url() -> str:
 
 
 def _build_project_url(project_id: str, filename: str) -> str:
-    return _build_url(_gate_base_url(), f"{project_id}/{filename}")
+    return _build_url(_gate_base_url(), f"published/{project_id}/{filename}")
 
 
 def _error_response(code: str, message: str, http_status: int = 400, **extra) -> http.JsonResponse:
@@ -81,15 +85,18 @@ def _error_response(code: str, message: str, http_status: int = 400, **extra) ->
 
 
 def _alloc_project() -> PublishingProject:
-    # Attempt a few times to avoid rare collisions
-    for _ in range(5):
-        token = _generate_token()
-        project_id = _generate_project_id()
+    token = _generate_token()
+
+    project_id_length = PROJECT_ID_MIN_LENGTH
+    for _ in range(PROJECT_ID_MAX_ATTEMPTS):
+        project_id = _generate_project_id(project_id_length)
         try:
             with transaction.atomic():
                 return PublishingProject.objects.create(token=token, project_id=project_id)
         except IntegrityError:
+            project_id_length += 1
             continue
+
     raise RuntimeError("unable_to_allocate_project")
 
 
