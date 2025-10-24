@@ -213,6 +213,49 @@ def publish_project(request: http.HttpRequest) -> http.HttpResponse:
 
 
 @csrf_exempt
+def delete_project(request: http.HttpRequest) -> http.HttpResponse:
+    if request.method != "POST":
+        return http.HttpResponse(status=405)
+
+    token = request.POST.get("token", "").strip()
+
+    if not token:
+        return _error_response("missing_token", "Missing project token")
+
+    try:
+        project = PublishingProject.objects.get(token=token)
+    except PublishingProject.DoesNotExist:
+        return _error_response("invalid_token", "Unknown project token", http_status=404)
+
+    target_dir = os.path.join(PUBLISHED_BASE_DIR, project.project_id)
+
+    if not project.published_url and not os.path.isdir(target_dir):
+        return _error_response("not_found", "Published project not found", http_status=404)
+
+    if os.path.isdir(target_dir):
+        try:
+            shutil.rmtree(target_dir)
+        except OSError as exc:
+            return _error_response(
+                "delete_failed",
+                "Failed to delete published files",
+                http_status=500,
+                detail=str(exc),
+            )
+
+    project.published_url = None
+    project.save(update_fields=["published_url", "updated_at"])
+
+    return http.JsonResponse(
+        {
+            "status": "ok",
+            "code": "deleted",
+            "project_id": project.project_id,
+        }
+    )
+
+
+@csrf_exempt
 def get_published_project(request: http.HttpRequest) -> http.HttpResponse:
     if request.method != "GET":
         return http.HttpResponse(status=405)

@@ -20,6 +20,7 @@ urlpatterns = [
     path('api/upload_build', uploads.upload_build),
     path('api/create_project', publishing.create_project),
     path('api/publish_project', publishing.publish_project),
+    path('api/delete_project', publishing.delete_project),
     path('api/get_published_project', publishing.get_published_project),
     path('api/download_renderer/<str:platform>-<str:version>', renderer_downloads.download_renderer),
 ]
