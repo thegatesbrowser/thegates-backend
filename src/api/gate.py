@@ -65,7 +65,7 @@ def featured_gates(req: http.HttpRequest) -> http.HttpResponse:
             'is_special': gate_obj.is_special
         })
     
-    output_json = json.dumps(result_list, indent=2)
+    output_json = json.dumps(result_list, separators=(",", ":"))
     return http.HttpResponse(content=output_json)
 
 
@@ -91,5 +91,5 @@ def all_gates(req: http.HttpRequest) -> http.HttpResponse:
             'number_of_entries': gate_obj.number_of_entries
         })
     
-    output_json = json.dumps(result_list, indent=2)
+    output_json = json.dumps(result_list, separators=(",", ":"))
     return http.HttpResponse(content=output_json)
