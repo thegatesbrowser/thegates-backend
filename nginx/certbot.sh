@@ -8,6 +8,6 @@ certbot certonly \
     --preferred-challenges dns \
     --authenticator dns-porkbun \
     --dns-porkbun-credentials /opt/certbot/porkbun.ini \
-    --dns-porkbun-propagation-seconds 60 \
+    --dns-porkbun-propagation-seconds 600 \
     -d "thegates.io" \
     -d "*.thegates.io"
