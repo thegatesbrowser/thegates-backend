@@ -1,7 +1,9 @@
-from mixpanel import Mixpanel
+from mixpanel import Mixpanel, Consumer
 
-key = open('keys/mixpanel.key', 'r').read()
-mp = Mixpanel(key)
+key = open('keys/mixpanel.key', 'r').read().strip()
+# EU data residency: send ingestion to Mixpanel's EU servers.
+# Without an explicit api_host the library defaults to the US endpoint.
+mp = Mixpanel(key, consumer=Consumer(api_host="api-eu.mixpanel.com"))
 
 
 def track(data):
